@@ -1,6 +1,6 @@
 services:
   nosql-db:
-    image: mongo
+    image: mvertes/alpine-mongo
     ports:
       - "27018:27017"
     container_name: nosql-db
@@ -21,7 +21,7 @@ services:
       - .:/app
       - /app/authentication-service/node_modules
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
     # Add other configuration like volumes, networks, etc.
 
   course-management-service:
@@ -38,7 +38,7 @@ services:
       - .:/app
       - /app/course-management-service/node_modules
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
     # Add other configuration like volumes, networks, etc.
 
   learner-service:
@@ -55,7 +55,7 @@ services:
       - .:/app
       - /app/learner-service/node_modules
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
     # Add other configuration like volumes, networks, etc.
 
 
@@ -73,7 +73,7 @@ services:
       - .:/app
       - /app/notification-service/node_modules
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
     # Add other configuration like volumes, networks, etc.
 
   nginx-proxy:
