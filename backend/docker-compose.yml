@@ -1,0 +1,90 @@
+services:
+  nosql-db:
+    image: mongo
+    ports:
+      - "27018:27017"
+    container_name: nosql-db
+    volumes:
+      - ./db/:/data/db
+
+  authentication-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./authentication-service
+    container_name: authentication
+    ports:
+      - "8001:8001"
+    restart: always
+    depends_on:
+      - "nosql-db"
+    volumes:
+      - .:/app
+      - /app/authentication-service/node_modules
+    environment:
+      NODE_ENV: production
+    # Add other configuration like volumes, networks, etc.
+
+  course-management-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./course-management-service
+    container_name: courses
+    ports:
+      - "8002:8002"
+    restart: always
+    depends_on:
+      - "nosql-db"
+    volumes:
+      - .:/app
+      - /app/course-management-service/node_modules
+    environment:
+      NODE_ENV: production
+    # Add other configuration like volumes, networks, etc.
+
+  learner-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./learner-service
+    container_name: lms
+    ports:
+      - "8003:8003"
+    restart: always
+    depends_on:
+      - "nosql-db"
+    volumes:
+      - .:/app
+      - /app/learner-service/node_modules
+    environment:
+      NODE_ENV: production
+    # Add other configuration like volumes, networks, etc.
+
+
+  notification-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./notification-service
+    container_name: notification
+    ports:
+      - "8004:8004"
+    restart: always
+    depends_on:
+      - "nosql-db"
+    volumes:
+      - .:/app
+      - /app/notification-service/node_modules
+    environment:
+      NODE_ENV: production
+    # Add other configuration like volumes, networks, etc.
+
+  nginx-proxy:
+    build:
+      dockerfile: Dockerfile
+      context: ./proxy
+    depends_on:
+      - authentication-service
+      - course-management-service
+      - learner-service
+      - notification-service
+    ports:
+      - "80:80"
+# Add network, volume configurations, and other service dependencies
