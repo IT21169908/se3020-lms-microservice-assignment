@@ -22,6 +22,8 @@ services:
       - /app/authentication-service/node_modules
     environment:
       NODE_ENV: development
+    env_file:
+      - ./authentication-service/.env.docker
     # Add other configuration like volumes, networks, etc.
 
   course-management-service:
@@ -39,6 +41,8 @@ services:
       - /app/course-management-service/node_modules
     environment:
       NODE_ENV: development
+    env_file:
+      - ./course-management-service/.env.docker
     # Add other configuration like volumes, networks, etc.
 
   learner-service:
@@ -56,6 +60,8 @@ services:
       - /app/learner-service/node_modules
     environment:
       NODE_ENV: development
+    env_file:
+      - ./learner-service/.env.docker
     # Add other configuration like volumes, networks, etc.
 
 
@@ -74,6 +80,8 @@ services:
       - /app/notification-service/node_modules
     environment:
       NODE_ENV: development
+    env_file:
+      - ./notification-service/.env.docker
     # Add other configuration like volumes, networks, etc.
 
   nginx-proxy:
