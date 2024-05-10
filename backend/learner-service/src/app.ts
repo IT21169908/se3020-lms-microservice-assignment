@@ -7,7 +7,9 @@ import favicon from 'serve-favicon';
 import * as favPath from 'path';
 
 const isProduction = process.env.NODE_ENV === "production";
+const API_URL_PREFIX = process.env.API_URL_PREFIX || "/";
 const app = express();
+const router = express.Router()
 
 
 app.use(express.json({limit: '20mb'}));
@@ -26,11 +28,12 @@ if (!isProduction) {
 }
 
 
-app.use(favicon(favPath.join(__dirname, "../resources", "favicons/favicon.ico")));
-app.use('/api/learner/static', express.static(favPath.join(__dirname, "../resources")));
+router.use(favicon(favPath.join(__dirname, "../resources", "favicons/favicon.ico")));
+router.use('/static', express.static(favPath.join(__dirname, "../resources")));
 
-app.get('/api/learner', (req, res) => {
+router.get('', (req, res) => {
     res.json("Learner service™ API").status(200);
 });
 
+app.use(API_URL_PREFIX, router);
 export default app;
