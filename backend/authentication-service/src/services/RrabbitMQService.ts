@@ -51,7 +51,7 @@ export class RabbitMQService {
             throw new Error('RabbitMQ channel is not initialized.');
         }
         // await this.channel.assertExchange(EXCHANGE_NAME, "direct", {durable: true});
-        const q = await this.channel.assertQueue(QUEUE_NAME, {exclusive: true});
+        const q = await this.channel.assertQueue(QUEUE_NAME);
         console.log(` Waiting for messages in queue: ${q.queue}`);
 
         await this.channel.bindQueue(q.queue, EXCHANGE_NAME, AUTH_SERVICE);
