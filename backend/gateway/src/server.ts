@@ -28,16 +28,31 @@ app.use("/api/course-management", proxy("http://localhost:8002"));
 app.use("/api/learner", proxy("http://localhost:8003"));
 app.use("/api/notification", proxy("http://localhost:8004")); // products
 
-app.get('/', (req, res) => {
-    const json = {
-        "id": "Gateway™ API",
-        "auth": ["http://localhost:8000/api/authentication", "http://localhost:8001/"],
-        "courses": ["http://localhost:8000/api/course-management", "http://localhost:8002/"],
-        "lms": ["http://localhost:8000/api/learner", "http://localhost:8003/"],
-        "notifications": ["http://localhost:8000/api/notification", "http://localhost:8004/"],
-    }
-    res.json(json).status(200);
-});
+app.get('/',
+    (req, res) => {
+        const json = {
+            "name": "Gateway™ API",
+            "services": {
+                "auth": {
+                    "base_url": "http://localhost:8001",
+                    "proxy_url": "http://localhost:8000/api/authentication",
+                },
+                "courses": {
+                    "base_url": "http://localhost:8002",
+                    "proxy_url": "http://localhost:8000/api/course-management",
+                },
+                "lms": {
+                    "base_url": "http://localhost:8003",
+                    "proxy_url": "http://localhost:8000/api/learner",
+                },
+                "notifications": {
+                    "base_url": "http://localhost:8004",
+                    "proxy_url": "http://localhost:8000/api/notification",
+                },
+            }
+        }
+        res.json(json).status(200);
+    });
 
 app.listen(8000, () => {
     console.log("Gateway is Listening to Port 8000");
