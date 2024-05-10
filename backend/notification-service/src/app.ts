@@ -27,9 +27,9 @@ if (!isProduction) {
 
 
 app.use(favicon(favPath.join(__dirname, "../resources", "favicons/favicon.ico")));
-app.use('/api/static', express.static(favPath.join(__dirname, "../resources")));
+app.use('/api/notification/static', express.static(favPath.join(__dirname, "../resources")));
 
-app.get('/api', (req, res) => {
+app.get('/api/notification', (req, res) => {
     res.json("Notification service™ API").status(200);
 });
 

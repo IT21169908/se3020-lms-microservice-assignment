@@ -27,10 +27,10 @@ if (!isProduction) {
 
 
 app.use(favicon(favPath.join(__dirname, "../resources", "favicons/favicon.ico")));
-app.use('/api/static', express.static(favPath.join(__dirname, "../resources")));
+app.use('/api/course-management/static', express.static(favPath.join(__dirname, "../resources")));
 
 // TODO: change route path
-app.get('/api', (req, res) => {
+app.get('/api/course-management', (req, res) => {
     res.json("Course Management service™ API").status(200);
 });
 
