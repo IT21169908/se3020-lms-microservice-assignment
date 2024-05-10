@@ -4,7 +4,7 @@ const env = {
     APP_SECRET: process.env.JWT_SECRET || "",
     EXCHANGE_NAME: process.env.EXCHANGE_NAME || "",
     MSG_QUEUE_URL: process.env.MSG_QUEUE_URL || "",
-    QUEUE_NAME: "COURSE_QUEUE",
+    QUEUE_NAME: "LMS_QUEUE",
     AUTH_SERVICE: "auth_service",
     COURSE_SERVICE: "course_service",
     LMS_SERVICE: "lms_service",

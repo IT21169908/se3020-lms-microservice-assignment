@@ -4,6 +4,7 @@ import env from "../config";
 import CourseService from "./CourseService";
 
 const {
+    QUEUE_NAME,
     EXCHANGE_NAME,
     COURSE_SERVICE,
     MSG_QUEUE_URL,
@@ -29,8 +30,8 @@ export class RabbitMQService {
         this.channel = await connection.createChannel();
 
         // Assert exchange for publishing
-        await this.channel.assertQueue(EXCHANGE_NAME, {durable: true});
-        // await this.channel.assertExchange(EXCHANGE_NAME, 'direct', { durable: false });
+        // await this.channel.assertQueue(EXCHANGE_NAME, {durable: true});
+        await this.channel.assertExchange(EXCHANGE_NAME, 'direct');
 
         console.log('RabbitMQ connection and channel initialized.');
 
@@ -49,11 +50,12 @@ export class RabbitMQService {
         if (!this.channel) {
             throw new Error('RabbitMQ channel is not initialized.');
         }
-        await this.channel.assertExchange(EXCHANGE_NAME, "direct", {durable: true});
-        const q = await this.channel.assertQueue("", {exclusive: true});
+        // await this.channel.assertExchange(EXCHANGE_NAME, "direct", {durable: true});
+        const q = await this.channel.assertQueue(QUEUE_NAME, {exclusive: true});
         console.log(` Waiting for messages in queue: ${q.queue}`);
 
         await this.channel.bindQueue(q.queue, EXCHANGE_NAME, COURSE_SERVICE);
+
         await this.channel.consume(q.queue, (msg: amqplib.ConsumeMessage | null) => {
                 if (msg !== null && msg.content) {
                     console.log("the message is:", msg.content.toString());
