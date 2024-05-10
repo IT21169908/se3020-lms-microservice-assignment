@@ -4,9 +4,9 @@ import {RabbitMQService} from "../services/RrabbitMQService";
 
 
 import env from "../config";
-import CourseService from "../services/CourseService";
+import CourseService from "../services/NotifyService";
 
-const {AUTH_SERVICE, LMS_SERVICE} = env
+const {LMS_SERVICE} = env
 
 // TODO: test purposes
 export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
@@ -16,16 +16,6 @@ export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
     rabbitMQ.subscribeMessage(courseService)
 
     router.get('/test', (req, res) => {
-
-        const authPayload = {
-            event: "LOGIN",
-            data: {
-                username: 'navod',
-                password: '1234567',
-                confirmPassword: '1234567',
-                remember: true,
-            }
-        }
 
         const lmsPayload = {
             event: "SAMPLE",
@@ -38,11 +28,10 @@ export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
         }
 
         // TODO: Publish service events
-        rabbitMQ.publishMessage(AUTH_SERVICE, JSON.stringify(authPayload))
         rabbitMQ.publishMessage(LMS_SERVICE, JSON.stringify(lmsPayload))
 
 
-        res.json({authPayload: authPayload, lmsPayload: lmsPayload, message: "COURSE SERVICE TEST ROUTE™ API"});
+        res.json({lmsPayload: lmsPayload, message: "NOTIFY SERVICE TEST ROUTE™ API"});
     });
 
 

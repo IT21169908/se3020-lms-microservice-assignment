@@ -5,7 +5,7 @@ import AuthService from "../services/AuthService";
 
 import env from "../config";
 
-const {COURSE_SERVICE} = env
+const {COURSE_SERVICE, NOTIFY_SERVICE} = env
 
 // TODO: test purposes
 export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
@@ -15,7 +15,7 @@ export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
     rabbitMQ.subscribeMessage(authService)
 
     router.get('/test', (req, res) => {
-        const payload = {
+        const coursePayload = {
             event: "SAMPLE",
             data: {
                 id: '65ffef24021037df10627bbd',
@@ -24,11 +24,25 @@ export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
                 isActive: true,
             }
         }
+        const notifyPayload = {
+            event: "SAMPLE",
+            data: {
+                "_id": "66006615f455579a2f713fa9",
+                "user_id": "66004de7d5dd17b8991741e5",
+                "title": "Timetable Change",
+                "message": "The timetable for one of your courses has been updated.",
+                "read": false,
+                "roles": [
+                    "Student"
+                ],
+            }
+        }
 
         // TODO: Publish service events
-        rabbitMQ.publishMessage(COURSE_SERVICE, JSON.stringify(payload))
+        rabbitMQ.publishMessage(COURSE_SERVICE, JSON.stringify(coursePayload))
+        rabbitMQ.publishMessage(NOTIFY_SERVICE, JSON.stringify(notifyPayload))
 
-        res.json({...payload, message: "COURSE SERVICE TEST ROUTE™ API"});
+        res.json({coursePayload, notifyPayload, message: "AUTH SERVICE TEST ROUTE™ API"});
     });
 
 
