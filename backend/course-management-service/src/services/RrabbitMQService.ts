@@ -1,12 +1,11 @@
 import * as amqplib from 'amqplib';
-import AuthService from "./AuthService";
 
-import env from "../config" ;
+import env from "../config";
+import CourseService from "./CourseService";
 
 const {
-    APP_SECRET,
     EXCHANGE_NAME,
-    AUTH_SERVICE,
+    COURSE_SERVICE,
     MSG_QUEUE_URL,
 } = env
 
@@ -46,7 +45,7 @@ export class RabbitMQService {
 
     }
 
-    async subscribeMessage(service: AuthService): Promise<void> {
+    async subscribeMessage(service: CourseService): Promise<void> {
         if (!this.channel) {
             throw new Error('RabbitMQ channel is not initialized.');
         }
@@ -54,7 +53,7 @@ export class RabbitMQService {
         const q = await this.channel.assertQueue("", {exclusive: true});
         console.log(` Waiting for messages in queue: ${q.queue}`);
 
-        await this.channel.bindQueue(q.queue, EXCHANGE_NAME, AUTH_SERVICE);
+        await this.channel.bindQueue(q.queue, EXCHANGE_NAME, COURSE_SERVICE);
         await this.channel.consume(q.queue, (msg: amqplib.ConsumeMessage | null) => {
                 if (msg !== null && msg.content) {
                     console.log("the message is:", msg.content.toString());

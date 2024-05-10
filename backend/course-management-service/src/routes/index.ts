@@ -1,32 +1,35 @@
 import {Router} from "express";
 import createHttpError from "http-errors";
 import {RabbitMQService} from "../services/RrabbitMQService";
-import AuthService from "../services/AuthService";
+
 
 import env from "../config";
+import CourseService from "../services/CourseService";
 
-const {COURSE_SERVICE} = env
+const {AUTH_SERVICE} = env
 
 // TODO: test purposes
 export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
 
-    const authService = new AuthService;
+    const courseService = new CourseService();
     // TODO: Listen to the events
-    rabbitMQ.subscribeMessage(authService)
+    rabbitMQ.subscribeMessage(courseService)
 
     router.get('/test', (req, res) => {
+
         const payload = {
-            event: "SAMPLE",
+            event: "LOGIN",
             data: {
-                id: '65ffef24021037df10627bbd',
-                name: 'SE3040',
-                price: '295000',
-                isActive: true,
+                username: 'navod',
+                password: '1234567',
+                confirmPassword: '1234567',
+                remember: true,
             }
         }
 
         // TODO: Publish service events
-        rabbitMQ.publishMessage(COURSE_SERVICE, JSON.stringify(payload))
+        rabbitMQ.publishMessage(AUTH_SERVICE, JSON.stringify(payload))
+
 
         res.json({...payload, message: "COURSE SERVICE TEST ROUTE™ API"});
     });
