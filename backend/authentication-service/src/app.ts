@@ -1,4 +1,5 @@
-// <reference path="global.d.ts" />
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="global.d.ts" />
 import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
@@ -7,12 +8,16 @@ import favicon from 'serve-favicon';
 import * as favPath from 'path';
 import {RabbitMQService} from "./services/RrabbitMQService";
 import {initRoutes} from "./routes";
+import {RequestLoggerHandler} from "./middleware/request-logger";
+import {ResponseHandler} from "./middleware/response-handler";
+import {jsonErrorHandler} from "./middleware/error-handler";
 
 const expressApp = async () => {
     const isProduction = process.env.NODE_ENV === "production";
-    const API_URL_PREFIX = process.env.API_URL_PREFIX ?? "/";
     const app = express();
-    const router = express.Router()
+
+    app.use(RequestLoggerHandler);
+    app.use(ResponseHandler);
 
     app.use(express.json({limit: '20mb'}));
     app.use(express.urlencoded({limit: '20mb', extended: true}));
@@ -31,16 +36,17 @@ const expressApp = async () => {
 
     const rabbitMQService = await RabbitMQService.getInstance()
 
-    router.use(favicon(favPath.join(__dirname, "../resources", "favicons/favicon.ico")));
-    router.use('/static', express.static(favPath.join(__dirname, "../resources")));
+    app.use(favicon(favPath.join(__dirname, "../resources", "favicons/favicon.ico")));
+    app.use('/static', express.static(favPath.join(__dirname, "../resources")));
 
-    router.get('', (req, res) => {
+    app.get('', (req, res) => {
         res.json("Auth service™ API").status(200);
     });
 
-    initRoutes(router, rabbitMQService)
+    initRoutes(app, rabbitMQService)
 
-    app.use(API_URL_PREFIX, router);
+    // Error Handling
+    app.use(jsonErrorHandler);
 
     return app;
 }

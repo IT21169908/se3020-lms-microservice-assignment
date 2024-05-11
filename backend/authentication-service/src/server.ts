@@ -3,7 +3,8 @@ import * as http from "http";
 import * as https from "https";
 import expressApp from "./app";
 import databaseSetup from "./bootstrap/database";
-// import {AppLogger} from "./utils/logger";
+import {AppLogger} from "./utils/logging";
+import startupPassport from "./bootstrap/passport";
 
 const startServer = async () => {
     const app = await expressApp();
@@ -23,17 +24,16 @@ const startServer = async () => {
     }
 
     databaseSetup().then(() => {
-        // AppLogger.info('--> Mongoose connected!');
+        AppLogger.info('--> Mongoose connected!');
         console.log('--> Mongoose connected!');
-        // passportStartup(app).then(() => {
-        // AppLogger.info('--> Passport started!');
-        server.listen(port, () => {
-            // AppLogger.info('--> HTTPS Server successfully started at port: ' + port);
-            console.log('--> HTTPS Server successfully started at port: ' + port);
-        });
-        // }).catch(console.error);
+        startupPassport(app).then(() => {
+            AppLogger.info('--> Passport started!');
+            server.listen(port, () => {
+                AppLogger.info('--> HTTPS Server successfully started at port: ' + port);
+                console.log('--> HTTPS Server successfully started at port: ' + port);
+            });
+        }).catch(console.error);
     }).catch(console.error);
 }
-
 
 startServer();
