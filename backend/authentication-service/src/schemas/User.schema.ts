@@ -1,11 +1,11 @@
 import * as mongoose from "mongoose";
-import { Schema } from "mongoose";
+import {Schema} from "mongoose";
 import * as bcrypt from 'bcryptjs';
-import {Permission, Role} from "../enums/auth";
-import { checkPermission } from "../middleware/validate-permissions";
-import { IUser } from "../models/User.model";
+import {Permission} from "../enums/auth";
+import {checkPermission} from "../middleware/validate-permissions";
+import {IUser} from "../models/User.model";
 import jwt from "jsonwebtoken";
-import { AppLogger } from "../utils/logging";
+import {AppLogger} from "../utils/logging";
 
 export const UserSchemaOptions: mongoose.SchemaOptions = {
     _id: true,
@@ -74,9 +74,9 @@ export const UserSchema = new mongoose.Schema({
     },
     deactivateReasons: {
         type: [{
-            reason: { type: Schema.Types.String, required: true },
-            deactivatedAt: { type: Schema.Types.Date, required: true },
-            deactivatedBy: { type: Schema.Types.Mixed, required: true }
+            reason: {type: Schema.Types.String, required: true},
+            deactivatedAt: {type: Schema.Types.Date, required: true},
+            deactivatedBy: {type: Schema.Types.Mixed, required: true}
         }],
         required: false,
         default: [],
@@ -104,7 +104,17 @@ UserSchema.pre<IUser>('save', function (next) {
 UserSchema.methods.createAccessToken = function (expiresIn = "365 days") {
     const jwtSecret = process.env.JWT_SECRET || "";
     AppLogger.info(`User Access Token Created (Expires In: ${expiresIn})`);
-    return jwt.sign({user_id: this._id}, jwtSecret, {expiresIn: expiresIn});
+    const payload = {
+        _id: this._id,
+        name: this.name,
+        email: this.email,
+        phone: this.phone,
+        signedUpAs: this.signedUpAs,
+        role: this.role,
+        permissions: this.permissions,
+        lastLoggedIn: this.lastLogin,
+    }
+    return jwt.sign(payload, jwtSecret, {expiresIn: expiresIn});
 };
 
 UserSchema.methods.comparePassword = function (password: string): Promise<boolean> {

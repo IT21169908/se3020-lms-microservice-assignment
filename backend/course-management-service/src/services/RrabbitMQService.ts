@@ -68,6 +68,8 @@ export class RabbitMQService {
             });
     }
 
+
+
     async close(): Promise<void> {
         if (this.channel) {
             await this.channel.close();

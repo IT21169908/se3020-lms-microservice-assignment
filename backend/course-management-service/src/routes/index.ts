@@ -4,6 +4,7 @@ import {RabbitMQService} from "../services/RrabbitMQService";
 
 
 import CourseService from "../services/CourseService";
+import {CourseRoutesInit} from "./course";
 
 
 // TODO: test purposes
@@ -11,12 +12,15 @@ export async function initRoutes(router: Router) {
 
     const rabbitMQService = await RabbitMQService.getInstance()
     const courseService = new CourseService(rabbitMQService);
-
     // TODO: Listen to the events
     await rabbitMQService.subscribeMessage(courseService)
 
-    router.get('/test', courseService.test);
+    router.get('', (req, res) => {
+        res.json("Course Management service™ API").status(200);
+    });
 
+    router.get('/test', courseService.test);
+    CourseRoutesInit(router, courseService);
 
     /* INVALID REQUESTS */
     // app.get('/', (req: Request, res: Response) => res.redirect(301, "/api"));

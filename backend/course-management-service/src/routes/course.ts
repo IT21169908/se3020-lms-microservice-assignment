@@ -1,13 +1,13 @@
-import {Express} from 'express';
+import {Router} from 'express';
 import CourseService from "../services/CourseService";
 
-export function CourseRoutesInit(app: Express, CourseController: CourseService) {
+export function CourseRoutesInit(router: Router, courseService: CourseService) {
 
     /* AUTH ROUTES (Admin) ===================================== */
-    // app.get('/api/admin/courses', CourseController.getAll);
-    // app.get('/api/admin/courses/:_id', CourseController.fetchCourseValidationRules(), CourseController.getById);
-    //
-    // app.post('/api/admin/courses', CourseController.createCourseValidationRules(), CourseController.create);
-    // app.put('/api/admin/courses/:_id', CourseController.updateCourseValidationRules(), CourseController.update);
-    // app.delete('/api/admin/courses/:_id', CourseController.fetchCourseValidationRules(), CourseController.deleteCourse);
+    router.get('/lecturer/courses', courseService.getAll.bind(courseService));
+    router.get('/lecturer/courses/:_id', courseService.fetchCourseValidationRules(), courseService.getById.bind(courseService));
+
+    router.post('/lecturer/courses', courseService.createCourseValidationRules(), courseService.create.bind(courseService));
+    router.put('/lecturer/courses/:_id', courseService.updateCourseValidationRules(), courseService.update.bind(courseService));
+    router.delete('/lecturer/courses/:_id', courseService.fetchCourseValidationRules(), courseService.deleteCourse.bind(courseService));
 }
