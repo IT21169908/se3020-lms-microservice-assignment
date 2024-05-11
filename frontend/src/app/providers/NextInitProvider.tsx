@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect} from "react";
-import {ChildrenProps} from "@/app/types/Common";
+import {ChildrenProps} from "@/types/Common";
 
 export const NextInitProvider = ({ children }: ChildrenProps) => {
 

@@ -6,7 +6,7 @@ import {AiOutlineClose} from "react-icons/ai";
 import Link from "next/link";
 import Button from "@/app/components/buttons/Button";
 import { motion } from 'framer-motion';
-import {NavbarProps} from "@/app/types/Common";
+import {NavbarProps} from "@/types/Common";
 
 const Navbar = (props: NavbarProps) => {
     const {data: session} = useSession();
@@ -76,7 +76,7 @@ const Navbar = (props: NavbarProps) => {
                             <Link href='/orders' className='hover:text-indigo-950 transition-colors'>Orders</Link>
                         </li>)}
                         <li><Link href='/about' className='hover:text-indigo-950 transition-colors'>About</Link></li>
-                        <li><Link href='/testimonials' className='hover:text-indigo-950 transition-colors'>Testimonials</Link></li>
+                        {/*<li><Link href='/testimonials' className='hover:text-indigo-950 transition-colors'>Testimonials</Link></li>*/}
                         <li><Link href='/faqs' className='hover:text-indigo-950 transition-colors'>Faqs</Link></li>
                         <li><Link href='/contact' className='hover:text-indigo-950 transition-colors'>Contact</Link></li>
                     </ul>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import {SectionHeaderProps} from "@/app/types/Common";
+import {SectionHeaderProps} from "@/types/Common";
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({ subHeading, heading, pera }) => {
 
