@@ -25,7 +25,7 @@ const buttonVariants = cva(
     }
 );
 
-const Button = ({ href, placeholder, color = 'primary', size = 'default' }: ButtonProps) => {
+const LinkButton = ({ href, placeholder, color = 'primary', size = 'default' }: ButtonProps) => {
     return (
         <Link href={href} className={clsx(buttonVariants({ color, size }))}>
             {placeholder}
@@ -33,4 +33,4 @@ const Button = ({ href, placeholder, color = 'primary', size = 'default' }: Butt
     );
 };
 
-export default Button;
+export default LinkButton;

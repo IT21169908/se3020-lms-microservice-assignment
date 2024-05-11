@@ -2,7 +2,7 @@
 
 import type {NextPage} from 'next';
 import {motion} from "framer-motion";
-import Button from "@/app/components/buttons/Button";
+import LinkButton from "@/app/components/buttons/LinkButton";
 import {BsFillCheckCircleFill} from "react-icons/bs";
 import Image from "next/image";
 import React from "react";
@@ -53,7 +53,7 @@ const Welcome: NextPage = () => {
                                 explore from anywhere. Discover endless possibilities for personal
                                 and professional development. Join us now!
                             </p>
-                            <Button
+                            <LinkButton
                                 color={"main"}
                                 placeholder={"Get Started"}
                                 href='/courses'

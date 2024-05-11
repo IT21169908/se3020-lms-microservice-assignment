@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className='bg-black pt-20 text-gray-400'
+          className='bg-gradient-to-t from-black to-indigo-500 pt-20 text-gray-400'
       >
         <div className='wrapper mx-auto'>
           <div className='overflow-hidden'>

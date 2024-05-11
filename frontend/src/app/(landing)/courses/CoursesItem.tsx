@@ -3,7 +3,7 @@ import {AiOutlineStar} from "react-icons/ai";
 import {Course} from "@/models/Course";
 import React from "react";
 import {currencyConverter} from "@/utils/converters";
-import Button from "@/app/components/buttons/Button";
+import LinkButton from "@/app/components/buttons/LinkButton";
 import {motion} from "framer-motion";
 
 const CoursesItem: React.FC<{ course: Course }> = ({course}) => {
@@ -61,7 +61,7 @@ const CoursesItem: React.FC<{ course: Course }> = ({course}) => {
                     <p className='text-lg font-semibold'>
                         {currencyConverter(course.price)}
                     </p>
-                    <Button
+                    <LinkButton
                         href={`/courses/${course.id}`}
                         placeholder='View details'
                         color='primary'

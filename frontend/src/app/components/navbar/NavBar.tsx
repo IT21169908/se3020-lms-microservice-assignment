@@ -4,7 +4,7 @@ import {useCallback, useState, useEffect} from "react";
 import {FiMenu} from "react-icons/fi";
 import {AiOutlineClose} from "react-icons/ai";
 import Link from "next/link";
-import Button from "@/app/components/buttons/Button";
+import LinkButton from "@/app/components/buttons/LinkButton";
 import { motion } from 'framer-motion';
 import {NavbarProps} from "@/types/Common";
 
@@ -88,14 +88,14 @@ const Navbar = (props: NavbarProps) => {
                         variants={linkFadeIn}
                     >
                         {!session ? (
-                            <Button
-                                href='/users/login'
+                            <LinkButton
+                                href='/login'
                                 placeholder='Sign in'
                                 color='primary'
                                 size='default'
                             />
                         ) : (
-                            <Button
+                            <LinkButton
                                 href='/users/profile'
                                 placeholder={userName}
                                 color='secondary'
