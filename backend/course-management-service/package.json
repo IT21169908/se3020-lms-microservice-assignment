@@ -21,9 +21,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "http-errors": "^2.0.0",
+    "moment-timezone": "^0.5.45",
     "mongoose": "^8.3.4",
     "morgan": "^1.10.0",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
@@ -36,6 +38,8 @@
     "@types/serve-favicon": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
+    "@types/moment-timezone": "^0.5.30",
+    "@types/winston": "^2.4.4",
     "eslint": "^8.57.0",
     "globals": "^15.1.0",
     "nodemon": "^3.1.0",
