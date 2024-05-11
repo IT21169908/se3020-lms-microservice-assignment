@@ -9,7 +9,7 @@ type Server = https.Server | http.Server;
 declare global {
     namespace Express {
         export interface Request {
-            // user?: User;
+            user?: User;
             // admin?: IAdmin;
         }
 
@@ -18,8 +18,12 @@ declare global {
             sendError: (error: unknown, errorCode?: number) => void;
         }
 
-        interface User extends IUser {
+        interface User {
             _id: ObjectId;
         }
+
+        // interface User extends IUser {
+        //     _id: ObjectId;
+        // }
     }
 }
