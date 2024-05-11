@@ -24,7 +24,7 @@ const FAQContent: NextPage = () => {
         {
             "id": "64b6dc5ad2cdaf770641530b",
             "question": "How can I contact customer support?",
-            "answer": "If you have any questions or need assistance, you can reach our customer support team by emailing support@learnify.com or by using the contact form on our website. We strive to respond to all inquiries within 24 hours."
+            "answer": "If you have any questions or need assistance, you can reach our customer support team by emailing support@easylearny.com or by using the contact form on our website. We strive to respond to all inquiries within 24 hours."
         },
         {
             "id": "64b6dc5ad2cdaf7706415308",
