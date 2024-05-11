@@ -2,27 +2,39 @@ import {NextFunction, Request, Response} from "express";
 import {RabbitMQService} from "./RrabbitMQService";
 
 import env from "../config";
+import Course from "../repository/CourseRepository";
+import {CourseValidations} from "../validations/course-validations";
+import {validationsChecker} from "../validations/validation-handler";
+import {DCourse} from "../models/CourseModel";
+import {Types} from "mongoose";
 
 const {AUTH_SERVICE, LMS_SERVICE} = env
 
 class CourseService {
 
     private readonly rabbitMQ: RabbitMQService;
+    private readonly courseRepository: Course;
 
     constructor(rabbitMQ: RabbitMQService) {
         this.rabbitMQ = rabbitMQ;
+        this.courseRepository = new Course()
         this.test = this.test.bind(this);
     }
 
     public test(req: Request, res: Response, next: NextFunction) {
-        console.log(this.rabbitMQ)
+        const user = req.user
+
         const authPayload = {
             event: "LOGIN",
             data: {
-                username: 'navod',
-                password: '1234567',
-                confirmPassword: '1234567',
-                remember: true,
+                "_id": user?._id || null,
+                "name": user?.name || null,
+                "email": user?.email || null,
+                "role": user?.role || null,
+                "permissions": user?.permissions || null,
+                "signedUpAs": user?.signedUpAs || null,
+                "phone": user?.phone || null,
+                "lastLoggedIn": user?.lastLoggedIn || null,
             }
         }
 
@@ -42,6 +54,92 @@ class CourseService {
 
 
         res.sendSuccess({authPayload: authPayload, lmsPayload: lmsPayload,}, "COURSE SERVICE TEST ROUTE™ API");
+    }
+
+    public createCourseValidationRules() {
+        return [
+            CourseValidations.name(),
+            CourseValidations.code(),
+            CourseValidations.description(),
+            CourseValidations.credits(),
+            CourseValidations.lecturerId(),
+        ];
+    }
+
+    public updateCourseValidationRules() {
+        return this.createCourseValidationRules();
+    }
+
+    public fetchCourseValidationRules() {
+        return [];
+    }
+
+// ================ CREATE - C ================
+    public create(req: Request, res: Response, next: NextFunction) {
+        if (validationsChecker(req, res)) {
+            const user = req.user;
+
+            const {name, code, description, credits, lecturer_id, status} = req.body;
+            const data: DCourse = {
+                status: status,
+                name: name,
+                code: code,
+                description: description,
+                credits: credits,
+                lecture_id: lecturer_id
+            };
+            this.courseRepository.createCourse(data, user).then(course => {
+                res.sendSuccess(course, "Course created successfully!");
+            }).catch(next);
+        }
+    }
+
+// ================ READ - R ================
+    public getAll(req: Request, res: Response, next: NextFunction) {
+        const user = req.user;
+        this.courseRepository.getAllCourses(user).then(courses => {
+            res.sendSuccess(courses, "Get all courses successfully!");
+        }).catch(next);
+    }
+
+    public getById(req: Request, res: Response, next: NextFunction) {
+        if (validationsChecker(req, res)) {
+            const user = req.user;
+            const courseId = req.params._id as unknown as Types.ObjectId;
+            this.courseRepository.getCourseById(courseId, user).then(course => {
+                res.sendSuccess(course, "Get course by ID successfully!");
+            }).catch(next);
+        }
+    }
+
+// ================ UPDATE - U ================
+    public async update(req: Request, res: Response, next: NextFunction) {
+        if (validationsChecker(req, res)) {
+            const user = req.user;
+            const courseId = req.params._id as unknown as Types.ObjectId;
+            const {name, code, description, credits, lecture_id} = req.body;
+            const courseDetails: Partial<DCourse> = {
+                name: name,
+                code: code,
+                description: description,
+                credits: credits,
+                lecture_id: lecture_id,
+            };
+            this.courseRepository.updateCourse(courseId, courseDetails, user).then(course => {
+                res.sendSuccess(course, "Course updated successfully!");
+            }).catch(next);
+        }
+    }
+
+// ================ DELETE - D ================
+    public deleteCourse(req: Request, res: Response, next: NextFunction) {
+        if (validationsChecker(req, res)) {
+            const courseId = req.params._id as unknown as Types.ObjectId;
+            const user = req.user;
+            this.courseRepository.deleteCourseById(courseId, user).then(course => {
+                res.sendSuccess(course, "Course deleted successfully!");
+            }).catch(next);
+        }
     }
 
     async SubscribeEvents(payload: string): Promise<void> {

@@ -1,5 +1,6 @@
 import http from "http";
 import https from "https";
+import {Permission, Role} from "./enums/auth";
 
 // type IUser = import('./models/User.model').IUser;
 // type IAdmin = import('./models/Admin.model').IAdmin;
@@ -20,6 +21,13 @@ declare global {
 
         interface User {
             _id: ObjectId;
+            name: string;
+            email: string;
+            phone?: string;
+            signedUpAs?: string;
+            readonly role: Role;
+            permissions: Permission[];
+            lastLoggedIn: Date;
         }
 
         // interface User extends IUser {

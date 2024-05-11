@@ -1,6 +1,9 @@
 import {RabbitMQService} from "./RrabbitMQService";
 import env from "../config";
 import {NextFunction, Request, Response} from "express";
+import {ObjectId, Types} from "mongoose";
+
+import {Permission, Role} from "../enums/auth";
 
 class AuthService {
 
@@ -16,7 +19,6 @@ class AuthService {
         const parsedPayload: PayloadData = JSON.parse(payload);
 
         const {event, data} = parsedPayload;
-        const {username, password, confirmPassword, remember} = data;
 
         switch (event) {
             case 'LOGIN':
@@ -72,10 +74,14 @@ class AuthService {
 interface PayloadData {
     event: string;
     data: {
-        username: string;
-        password: string;
-        confirmPassword: string;
-        remember?: boolean;
+        _id: ObjectId;
+        name: string;
+        email: string;
+        phone?: string;
+        signedUpAs?: string;
+        readonly role: Role;
+        permissions: Permission[];
+        lastLoggedIn: Date;
     };
 }
 

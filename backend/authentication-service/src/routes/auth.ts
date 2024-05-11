@@ -1,5 +1,6 @@
-import {Express} from 'express';
+import {Express, NextFunction, Request, Response} from 'express';
 import AuthService from "../services/AuthService";
+import User from "../schemas/User.schema";
 
 export function AuthRoutesInit(app: Express, authService: AuthService) {
 
@@ -14,7 +15,22 @@ export function AuthRoutesInit(app: Express, authService: AuthService) {
     /* PUBLIC ROUTES ===================================== */
     // app.post('/api/public/tester', UserEp.authenticateValidationRules(), UserEp.tester);
 
-    // app.post('/api/public/login', UserEp.authenticateValidationRules(), UserEp.loginUser);
+    app.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+        const user = await User.findOne({email: req.body.email});
+        if (user) {
+            const isMatch = await user.comparePassword(req.body.password);
+            if (!isMatch) {
+                res.sendError('Incorrect email/password combination!', 401);
+            }
+
+            const token = user.createAccessToken("24 hours");
+
+            res.sendSuccess({token: token, user: user}, "Login Success")
+        } else {
+            res.sendError('User not found in the system!', 403);
+        }
+
+    });
     // app.post('/api/public/register', UserEp.registerValidationRules(), UserEp.registerUser);
     // app.post('/api/public/forgot-password', UserEp.forgotPasswordValidationRules(), UserEp.forgotPassword);
     // app.post('/api/public/reset-password', UserEp.resetPasswordValidationRules(), UserEp.resetPassword);
