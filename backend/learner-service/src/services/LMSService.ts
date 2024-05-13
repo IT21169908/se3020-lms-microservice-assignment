@@ -56,7 +56,7 @@ class LMSService {
      async create(req: Request, res: Response, next: NextFunction): Promise<void> {
         if (validationsChecker(req, res)) {
             const ownUser = req.user as IUser;
-            if (ownUser && [Role.ADMIN, Role.FACULTY_STAFF].includes(parseInt(ownUser.role.toString()))) {
+            if (ownUser && [Role.ADMIN, Role.LECTURER].includes(parseInt(ownUser.role.toString()))) {
                 const { session, time, date, courseId, facultyId, location } = req.body;
                 const data: DEnroll = {
                     session: session,
@@ -79,7 +79,7 @@ class LMSService {
      async update(req: Request, res: Response, next: NextFunction): Promise<void> {
         if (validationsChecker(req, res)) {
             const ownUser = req.user as IUser;
-            if (ownUser && [Role.ADMIN, Role.FACULTY_STAFF].includes(parseInt(ownUser.role.toString()))) {
+            if (ownUser && [Role.ADMIN, Role.LECTURER].includes(parseInt(ownUser.role.toString()))) {
                 const { enrollId, session, date, time, courseId, facultyId, location } = req.body;
                 const enrollDetails: Partial<DEnroll> = {
                     session: session,
@@ -102,7 +102,7 @@ class LMSService {
      async remove(req: Request, res: Response, next: NextFunction): Promise<void> {
         if (validationsChecker(req, res)) {
             const ownUser = req.user as IUser;
-            if (ownUser && [Role.ADMIN, Role.FACULTY_STAFF].includes(parseInt(ownUser.role.toString()))) {
+            if (ownUser && [Role.ADMIN, Role.LECTURER].includes(parseInt(ownUser.role.toString()))) {
                 const enrollId = req.params.enrollId as unknown as Types.ObjectId;
                 await EnrollDao.deleteEnroll(enrollId as Types.ObjectId, ownUser).then(enroll => {
                     res.sendSuccess(enroll, "Enroll deleted successfully!");

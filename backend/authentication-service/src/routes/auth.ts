@@ -13,7 +13,7 @@ export function AuthRoutesInit(app: Express, authService: AuthService) {
     // });
 
     /* PUBLIC ROUTES ===================================== */
-    // app.post('/api/public/tester', UserEp.authenticateValidationRules(), UserEp.tester);
+    // app.post('/tester', UserEp.authenticateValidationRules(), UserEp.tester);
 
     app.post('/login', async (req: Request, res: Response, next: NextFunction) => {
         const user = await User.findOne({email: req.body.email});
@@ -31,15 +31,16 @@ export function AuthRoutesInit(app: Express, authService: AuthService) {
         }
 
     });
-    // app.post('/api/public/register', UserEp.registerValidationRules(), UserEp.registerUser);
-    // app.post('/api/public/forgot-password', UserEp.forgotPasswordValidationRules(), UserEp.forgotPassword);
-    // app.post('/api/public/reset-password', UserEp.resetPasswordValidationRules(), UserEp.resetPassword);
-    // app.get('/api/public/token-validate/:token', UserEp.tokenValidationRules(), UserEp.tokenValidate);
-    // app.get('/api/public/logout', UserEp.logout);
+
+    app.post('/register', UserEp.registerValidationRules(), UserEp.registerUser);
+    app.post('/forgot-password', UserEp.forgotPasswordValidationRules(), UserEp.forgotPassword);
+    app.post('/reset-password', UserEp.resetPasswordValidationRules(), UserEp.resetPassword);
+    app.get('/token-validate/:token', UserEp.tokenValidationRules(), UserEp.tokenValidate);
+    app.get('/logout', UserEp.logout);
 
     /* AUTH ROUTES ===================================== */
-    // app.get('/api/auth/me', UserEp.getSelf);
-    // app.put('/api/auth/me', UserEp.updateUserValidationRules(true), UserEp.updateSelf);
-    // app.delete('/api/auth/me', UserEp.deactivate);
+    app.get('/me', UserEp.getSelf);
+    app.put('/me', UserEp.updateUserValidationRules(true), UserEp.updateSelf);
+    app.delete('/me', UserEp.deactivate);
 
 }
