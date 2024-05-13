@@ -2,7 +2,7 @@
 FROM node
 
 # Set working directory
-WORKDIR /app/notification-service
+WORKDIR /app/payment-service
 
 # Copy package.json and package-lock.json
 COPY package.json .
