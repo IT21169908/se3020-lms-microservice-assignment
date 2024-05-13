@@ -1,5 +1,5 @@
 import * as mongoose from "mongoose";
-import {IUser} from "../models/User.model";
+import { IUser } from "../models/User.model";
 
 export type ObjectIdOr<T extends mongoose.Document> = mongoose.Types.ObjectId | T;
 

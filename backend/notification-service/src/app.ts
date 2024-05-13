@@ -1,4 +1,4 @@
-// <reference path="global.d.ts" />
+/// <reference path="global.d.ts" />
 import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
