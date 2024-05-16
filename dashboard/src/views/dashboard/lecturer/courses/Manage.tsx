@@ -110,7 +110,7 @@ const ManageCourses: React.FC = () => {
     useEffect(() => {
         async function loadCourses() {
             try {
-                const res = await CourseService.getAllCourses();
+                const res = await CourseService.getCoursesByLoggedUser();
                 if (isMounted) {
                     setCourses(res.data);
                     setFilteredCourses(res.data);

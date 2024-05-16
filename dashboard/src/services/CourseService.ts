@@ -14,6 +14,16 @@ export class CourseService {
     }
 
     static async getAllCourses(): Promise<AppResponse<Course[]>> {
+        const ep = ApiUtils.adminCourseMSServiceUrl('courses');
+        const response = await axios.get<Partial<Course>, AxiosAppResponse<Course[]>>(ep, this.config);
+        if (response.data.success) {
+            return response.data;
+        } else {
+            throw Error("Request failed with status: " + response.status + " message: " + response.data.error);
+        }
+    }
+
+    static async getCoursesByLoggedUser(): Promise<AppResponse<Course[]>> {
         const ep = ApiUtils.lecturerCourseMSServiceUrl('courses');
         const response = await axios.get<Partial<Course>, AxiosAppResponse<Course[]>>(ep, this.config);
         if (response.data.success) {

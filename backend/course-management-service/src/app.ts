@@ -41,6 +41,7 @@ const expressApp = async () => {
     router.use('/static', express.static(favPath.join(__dirname, "../resources")));
 
     app.use('/', Authentication.verifyToken)
+    app.use('/admin', Authentication.verifyToken, verifyRole([Role.ADMIN]));
     app.use('/lecturer', Authentication.verifyToken, verifyRole([Role.LECTURER]));
 
     await initRoutes(router)

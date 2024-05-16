@@ -44,6 +44,19 @@ export default class CourseRepository {
         }
     }
 
+    public async getCoursesByLecturerId(lecturerId: Types.ObjectId, user?: Express.User): Promise<ICourse[]> {
+        const courses = await Course.find({lecture_id: lecturerId});
+
+        if (courses.length > 0) {
+            AppLogger.info(`Courses Found for Lecturer(ID: ${lecturerId}) by ${getRoleTitle(user?.role)} (ID: ${user?._id})`);
+            return courses;
+        } else {
+            AppLogger.info(`No Courses Found for Lecturer(ID: ${lecturerId})`);
+            // You can choose to throw an error if no courses are found or return an empty array based on your application's requirements
+            throw new ApplicationError(`No courses found for Lecturer ID: ${lecturerId}`, 404);
+        }
+    }
+
     public async updateCourse(courseId: Types.ObjectId, courseDetails: Partial<DCourse>, user?: Express.User): Promise<ICourse> {
         const updatedCourse = await Course.findByIdAndUpdate(courseId, courseDetails as any, {new: true});
         if (updatedCourse) {

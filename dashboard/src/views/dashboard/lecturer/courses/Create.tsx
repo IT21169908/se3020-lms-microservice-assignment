@@ -159,7 +159,7 @@ function CourseCreate({enableEdit}: { enableEdit: boolean }) {
                                     <Select.Option value="inactive">Inactive</Select.Option>
                                 </Select>
                             </Form.Item>
-                            <Form.Item className="ninjadash-form-action">
+                            <Form.Item className="ninjadash-form-action mt-4">
                                 <Button className="btn-signin" type="primary" htmlType="submit" size="large">
                                     Save
                                 </Button>

@@ -104,6 +104,21 @@ class CourseService {
         }).catch(next);
     }
 
+    public getCoursesByLecturerId(req: Request, res: Response, next: NextFunction) {
+        const user = req.user;
+        const lecturerId = req.params._lecture as unknown as Types.ObjectId;
+        this.courseRepository.getCoursesByLecturerId(lecturerId).then(courses => {
+            res.sendSuccess(courses, "Get all courses successfully!");
+        }).catch(next);
+    }
+
+    public getMyCourses(req: Request, res: Response, next: NextFunction) {
+        const user = req.user;
+        this.courseRepository.getCoursesByLecturerId(user?._id!).then(courses => {
+            res.sendSuccess(courses, "Get all courses successfully!");
+        }).catch(next);
+    }
+
     public getById(req: Request, res: Response, next: NextFunction) {
         if (validationsChecker(req, res)) {
             const user = req.user;
@@ -119,10 +134,11 @@ class CourseService {
         if (validationsChecker(req, res)) {
             const user = req.user;
             const courseId = req.params._id as unknown as Types.ObjectId;
-            const {name, code, description, credits, lecture_id} = req.body;
+            const {name, code, description, fee, credits, lecture_id} = req.body;
             const courseDetails: Partial<DCourse> = {
                 name: name,
                 code: code,
+                fee: fee,
                 description: description,
                 credits: credits,
                 lecture_id: lecture_id,

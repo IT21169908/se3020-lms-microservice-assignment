@@ -22,7 +22,7 @@ function LecturerRoutes() {
 
                 <Route path="/courses" element={<ManageCourses/>}/>
                 <Route path="/courses/create" element={<CourseCreate enableEdit={false}/>}/>
-                <Route path="/courses/:spectacle/edit" element={<EditCourse enableEdit/>}/>
+                <Route path="/courses/:course/edit" element={<EditCourse enableEdit/>}/>
 
                 <Route path="/*" element={<NotFound/>}/>
             </Routes>
