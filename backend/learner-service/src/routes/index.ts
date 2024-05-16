@@ -5,6 +5,7 @@ import {RabbitMQService} from "../services/RrabbitMQService";
 
 import env from "../config";
 import CourseService from "../services/LMSService";
+import {StudentRoutesInit} from "./student";
 
 const {AUTH_SERVICE, COURSE_SERVICE} = env
 
@@ -29,6 +30,7 @@ export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
         }
         // TODO: Publish service events
         rabbitMQ.publishMessage(COURSE_SERVICE, JSON.stringify(coursePayload))
+        StudentRoutesInit(router, courseService);
 
 
         res.json({coursePayload, message: "LMS SERVICE TEST ROUTE™ API"});
