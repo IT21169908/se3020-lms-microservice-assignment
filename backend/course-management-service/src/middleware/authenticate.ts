@@ -3,8 +3,6 @@ import {AppLogger} from "../utils/logger";
 import passport from "passport";
 import createHttpError from "http-errors";
 
-const jwt = require("jsonwebtoken");
-
 export class Authentication {
 
     // TODO: this also works fine
