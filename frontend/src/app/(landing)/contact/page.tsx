@@ -108,7 +108,7 @@ const ContactPage = () => {
                         type='text'
                         name='name'
                         id='name'
-                        placeholder='Sarah Parker'
+                        placeholder='Name'
                         required
                     />
                   </div>
@@ -151,7 +151,7 @@ const ContactPage = () => {
                       type='email'
                       name='email'
                       id='email'
-                      placeholder='sara@example.com'
+                      placeholder='mail@example.com'
                       required
                   />
                 </div>

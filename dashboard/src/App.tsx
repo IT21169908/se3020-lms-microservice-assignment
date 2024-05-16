@@ -19,6 +19,7 @@ const {themeColor} = config;
 
 const ProviderConfig = () => {
     const dispatch = useAppDispatch();
+    const [isStudent, setIsStudent] = useState(false);
 
     const {isLoaded, isLoggedIn, authUser, rtl, topMenu, mainContent} = useAppSelector((state: RootState) => {
         return {
@@ -47,6 +48,21 @@ const ProviderConfig = () => {
             controller.abort();
         };
     }, [dispatch, path]);
+
+    useEffect(() => {
+        const currentPath = window.location.href;
+        if (currentPath.includes("student/dashboard/course")) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('courseId');
+            if (courseId) {
+                localStorage.setItem('courseId', courseId);
+            }
+        }
+        if (!isLoggedIn && currentPath.includes("student/dashboard/course")) {
+            window.location.href = '/login';
+        }
+    }, []);
+
     console.log(isLoggedIn,authUser)
     return (
         <ConfigProvider direction={rtl ? 'rtl' : 'ltr'}>

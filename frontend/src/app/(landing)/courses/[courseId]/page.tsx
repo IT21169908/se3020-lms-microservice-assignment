@@ -18,7 +18,7 @@ const CourseDetails = ({params}: any) => {
         if (session) {
             router.push(`/checkout/${course?.id}`);
         } else {
-            router.push(`/users/login?destination=/checkout/${course?.id}`);
+            router.push(`http://localhost:3001/student/dashboard/course?courseId=${course?.id}`);
         }
     };
 

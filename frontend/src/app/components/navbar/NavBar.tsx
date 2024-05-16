@@ -89,7 +89,7 @@ const Navbar = (props: NavbarProps) => {
                     >
                         {!session ? (
                             <LinkButton
-                                href='/login'
+                                href='http://localhost:3001/login'
                                 placeholder='Sign in'
                                 color='primary'
                                 size='default'
