@@ -6,6 +6,7 @@ interface CommonAttributes {
     code: string;
     description: string;
     credits: number;
+    fee: number;
     lecture_id: StringOrObjectId;
 }
 

@@ -37,6 +37,12 @@ export const CourseValidations = {
         .withMessage('Credits is required!')
         .isNumeric()
         .withMessage('Credits should be a number!'),
+    fee: () => check('fee')
+        .not()
+        .isEmpty()
+        .withMessage('Fee is required!')
+        .isNumeric()
+        .withMessage('Fee should be a number!'),
 
     lecturerId: (key: string = "lecturer_id") => check(key)
         .not()

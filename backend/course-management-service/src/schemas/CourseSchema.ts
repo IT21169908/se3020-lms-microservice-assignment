@@ -33,6 +33,10 @@ const CourseSchema = new mongoose.Schema({
         type: Schema.Types.Number,
         required: true,
     },
+    fee: {
+        type: Schema.Types.Number,
+        required: true,
+    },
     lecture_id: {
         type: Schema.Types.ObjectId,
         required: true,

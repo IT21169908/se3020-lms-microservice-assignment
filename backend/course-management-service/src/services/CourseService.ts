@@ -62,6 +62,7 @@ class CourseService {
             CourseValidations.code(),
             CourseValidations.description(),
             CourseValidations.credits(),
+            CourseValidations.fee(),
             CourseValidations.lecturerId(),
         ];
     }
@@ -79,11 +80,12 @@ class CourseService {
         if (validationsChecker(req, res)) {
             const user = req.user;
 
-            const {name, code, description, credits, lecturer_id, status} = req.body;
+            const {name, code, fee, description, credits, lecturer_id, status} = req.body;
             const data: DCourse = {
                 status: status,
                 name: name,
                 code: code,
+                fee: fee,
                 description: description,
                 credits: credits,
                 lecture_id: lecturer_id

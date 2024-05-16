@@ -1,45 +1,39 @@
 import React, {ReactNode, useEffect, useState} from 'react';
-import { Button, Col, Input, message, Popconfirm, Row, Skeleton, Table } from 'antd';
+import {Button, Col, Input, message, Popconfirm, Row, Skeleton, Table} from 'antd';
 import type {ColumnsType} from 'antd/es/table';
 import {PageHeader} from "../../../../components/breadcrumbs/DashboardBreadcrumb";
 import {Download, HouseDoor, Pencil, Plus, Search, Trash2} from "react-bootstrap-icons";
 import {BorderLessHeading, Main, TopToolBox} from "../../../../components/styled-components/styled-containers";
 import {Cards} from "../../../../components/cards/frame/CardFrame";
 import {Link} from "react-router-dom";
-import Spectacle from "../../../../models/Spectacle";
-import {SpectacleService} from "../../../../services/SpectacleService";
+import {CourseService} from "../../../../services/CourseService";
 import {NotFoundWrapper} from "../../layout/style";
 import Heading from "../../../../components/heading/Heading";
 import JsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import {getCurrentDateTime} from "../../../../utils/date-time";
+import Course from "../../../../models/Courses";
 
 interface DataType {
     key: React.Key;
     _id?: string;
     name: ReactNode;
-    frameStyle: string;
-    frameMaterial: string;
-    lensType: string;
-    lensMaterial: string;
-    lensCoating: string;
-    color: string;
-    size: string;
-    price: number;
+    code: string;
+    description: string;
+    credits: string;
+    fee: string;
+    status: string;
     action: ReactNode;
 }
 
 const dataTableColumn: ColumnsType<DataType> = [
     //{title: 'Id', dataIndex: '_id', key: '_id'},
     {title: 'Name', dataIndex: 'name', key: 'name'},
-    {title: 'Frame Style', dataIndex: 'frameStyle', key: 'frameStyle'},
-    {title: 'Frame Material', dataIndex: 'frameMaterial', key: 'frameMaterial'},
-    {title: 'Lens Type', dataIndex: 'lensType', key: 'lensType'},
-    {title: 'Lens Material', dataIndex: 'lensMaterial', key: 'lensMaterial'},
-    {title: 'Lens Coating', dataIndex: 'lensCoating', key: 'lensCoating'},
-    {title: 'Color', dataIndex: 'color', key: 'color'},
-    {title: 'Size', dataIndex: 'size', key: 'size'},
-    {title: 'Price', dataIndex: 'price', key: 'price'},
+    {title: 'Code', dataIndex: 'code', key: 'code'},
+    {title: 'Description', dataIndex: 'description', key: 'description'},
+    {title: 'Credits', dataIndex: 'credits', key: 'credits'},
+    {title: 'Fee', dataIndex: 'fee', key: 'fee'},
+    {title: 'Status', dataIndex: 'status', key: 'status'},
     {
         title: 'Action',
         dataIndex: 'action',
@@ -52,57 +46,51 @@ const dataTableColumn: ColumnsType<DataType> = [
 const BreadcrumbItem = [
     {
         title: <div className="d-flex align-items-center"><HouseDoor/> &nbsp; Home</div>,
-        href: '/admin',
+        href: '/lecture',
     },
     {
-        title: 'Manage Spectacles',
+        title: 'Manage Courses',
     },
 ];
 
-const ManageSpectacles: React.FC = () => {
+const ManageCourses: React.FC = () => {
 
-    const [spectacles, setSpectacles] = useState<Spectacle[]>([]);
-    const [filteredSpectacles, setFilteredSpectacles] = useState<Spectacle[]>([]);
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
     const [tableDataSource, setTableDataSource] = useState<DataType[]>([]);
     const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
 
-    const formatDataSource = (spectacles: Spectacle[]): DataType[] => {
-        return spectacles.map((spectacle) => {
+    const formatDataSource = (courses: Course[]): DataType[] => {
+        return courses.map((course) => {
             const {
                 _id,
                 name,
-                frameStyle,
-                frameMaterial,
-                lensType,
-                lensMaterial,
-                lensCoating,
-                color,
-                size,
-                price,
-            } = spectacle;
+                code,
+                description,
+                credits,
+                fee,
+                status,
+            } = course;
 
-            return {
+            const record: DataType = {
                 key: _id,
-                //_id: `#${_id}`,
+                // _id: `#${_id}`,
                 name: <span className="ninjadash-username">{name}</span>,
-                frameStyle,
-                frameMaterial,
-                lensType,
-                lensMaterial,
-                lensCoating,
-                color,
-                size,
-                price,
+                code,
+                description,
+                credits: `${credits}`,
+                fee: `${fee}`,
+                status,
                 action: (
                     <div className="table-actions">
                         <Link
                             className="btn btn-sm btn-warning text-white me-1"
-                            to={`/admin/spectacles/${_id}/edit`}
+                            to={`/lecturer/courses/${_id}/edit`}
                         >
                             <Pencil/>
                         </Link>
                         <Popconfirm
-                            title="Are You sure you want to delete this spectacle?"
+                            title="Are You sure you want to delete this courses?"
                             onConfirm={() => deleteSpectacle(_id)}
                             onCancel={() => message.error('Delete canceled!')}
                             okText="Yes"
@@ -115,16 +103,17 @@ const ManageSpectacles: React.FC = () => {
                     </div>
                 ),
             };
+            return record;
         });
     };
 
     useEffect(() => {
-        async function loadSpectacles() {
+        async function loadCourses() {
             try {
-                const res = await SpectacleService.getAllSpectacles();
+                const res = await CourseService.getAllCourses();
                 if (isMounted) {
-                    setSpectacles(res.data);
-                    setFilteredSpectacles(res.data);
+                    setCourses(res.data);
+                    setFilteredCourses(res.data);
                     setIsLoadingData(false);
                 }
             } catch (error: any) {
@@ -134,7 +123,7 @@ const ManageSpectacles: React.FC = () => {
 
         let isMounted = true;
 
-        loadSpectacles();
+        loadCourses();
         return () => {
             // TODO unset tableDataSource[]
             isMounted = false;
@@ -142,19 +131,19 @@ const ManageSpectacles: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        setTableDataSource(formatDataSource(filteredSpectacles));
-    }, [filteredSpectacles])
+        setTableDataSource(formatDataSource(filteredCourses));
+    }, [filteredCourses])
 
 
     const deleteSpectacle = async (_id: string) => {
         try {
-            const res = await SpectacleService.deleteSpectacle(_id);
+            const res = await CourseService.deleteCourse(_id);
             if (res.success) {
                 message.success(`${res.message}`);
                 // TODO: REFACTOR this. Do not use filter, when large no of records exist
-                const updatedSpectacles = spectacles.filter(spectacle => spectacle._id !== _id);
-                setSpectacles(updatedSpectacles);
-                setFilteredSpectacles(updatedSpectacles);
+                const updatedCourses = courses.filter(courses => courses._id !== _id);
+                setCourses(updatedCourses);
+                setFilteredCourses(updatedCourses);
             }
         } catch (error: any) {
             message.error(`${error.response.data.error || error.response.data.message}`)
@@ -169,36 +158,33 @@ const ManageSpectacles: React.FC = () => {
         doc.text("Spectacle Report", 14, 20);
 
         // Create a table
-        const tableData = spectacles.map((s) => [
+        const tableData = courses.map((s) => [
             s.name,
-            s.frameStyle,
-            s.frameMaterial,
-            s.lensType,
-            s.lensMaterial,
-            s.lensCoating,
-            s.color,
-            s.size,
-            s.price.toString(),
+            s.code,
+            s.description,
+            s.credits,
+            s.fee,
+            s.status,
         ]);
         autoTable(doc, {
-            head: [['Name', 'Frame Style', 'Frame Material', 'Lens Type', 'Lens Material', 'Lens Coating', 'Color', 'Size', 'Price']],
+            head: [['Name', 'code', 'description', 'credits', 'fee', 'status']],
             body: tableData,
         })
 
         // Save the document
-        doc.save(`spectacle-report-${getCurrentDateTime()}.pdf`);
+        doc.save(`courses-report-${getCurrentDateTime()}.pdf`);
     };
-    console.log("spectacle --> ", spectacles);
+    console.log("courses --> ", courses);
 
 
     const handleSearch = (e: any) => {
         console.log(e.target.value)
-        const data = spectacles.filter((item) => {
+        const data = courses.filter((item) => {
             return Object.keys(item).some((key) =>
                 item[key].toString().toLowerCase().includes(e.target.value.toLowerCase())
             )
         });
-        setFilteredSpectacles(data);
+        setFilteredCourses(data);
     };
 
     if (isLoadingData) {
@@ -206,7 +192,7 @@ const ManageSpectacles: React.FC = () => {
             <Row gutter={25} className="justify-content-center">
                 <Col md={6} lg={12} xs={24}>
                     <Cards title="Loading..." caption="Loading Skeleton">
-                        <Skeleton active paragraph={{rows: 16}} />
+                        <Skeleton active paragraph={{rows: 16}}/>
                     </Cards>
                 </Col>
             </Row>
@@ -214,7 +200,7 @@ const ManageSpectacles: React.FC = () => {
     }
 
     return (<>
-            <PageHeader className="ninjadash-page-header-main" title="Manage Spectacles" routes={BreadcrumbItem}/>
+            <PageHeader className="ninjadash-page-header-main" title="Manage Courses" routes={BreadcrumbItem}/>
             <Main>
                 <Row gutter={15}>
                     <Col xs={24}>
@@ -231,7 +217,7 @@ const ManageSpectacles: React.FC = () => {
                                     <Button className="btn btn-warning h-auto me-2" onClick={generatePDF}>
                                         <Download className="me-2"/> Export PDF
                                     </Button>
-                                    <Link className="btn btn-primary h-auto" type="link" to="/admin/spectacles/create">
+                                    <Link className="btn btn-primary h-auto" type="link" to="/lecturer/courses/create">
                                         <Plus/> Add New
                                     </Link>
                                 </>
@@ -240,7 +226,7 @@ const ManageSpectacles: React.FC = () => {
                                     tableDataSource.length === 0 ? (
                                         <Col md={24}>
                                             <NotFoundWrapper>
-                                                <Heading as="h1">No Spectacles Found</Heading>
+                                                <Heading as="h1">No Courses Found</Heading>
                                             </NotFoundWrapper>
                                         </Col>
                                     ) : (
@@ -256,4 +242,4 @@ const ManageSpectacles: React.FC = () => {
     )
 };
 
-export default ManageSpectacles;
+export default ManageCourses;

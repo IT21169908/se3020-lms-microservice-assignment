@@ -19,8 +19,8 @@ export class ApiUtils {
         return this.apiUrl + '/api/authentication/admin/' + path;
     }
 
-    public static lecturerUrl(path: string) {
-        return this.apiUrl + '/api/authentication/lecturer/' + path;
+    public static lecturerCourseMSServiceUrl(path: string) {
+        return this.apiUrl + '/api/course-management/lecturer/' + path;
     }
 
     public static studentUrl(path: string) {
