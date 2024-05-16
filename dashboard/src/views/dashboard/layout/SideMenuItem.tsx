@@ -7,6 +7,7 @@ import {RootState} from "../../../redux/store";
 import {Role} from "../../../enums/Role";
 import AdminSideBarItems from "../admin/AdminSideBarItems";
 import LecturerSideBarItems from "../lecturer/LecturerSideBarItems";
+import StudentSideBarItems from "../student/StudentSideBarItems";
 
 function SideMenuItem({toggleCollapsed}: { toggleCollapsed: () => void }) {
 
@@ -72,10 +73,10 @@ function SideMenuItem({toggleCollapsed}: { toggleCollapsed: () => void }) {
             path = "/admin";
             items = AdminSideBarItems({translate, path, toggleCollapsed, topMenu});
             break;
-        // case Role.STUDENT:
-        //     path = "/student";
-        //     items = StudentSideBarItems({translate, path, toggleCollapsed, topMenu});
-        //     break;
+        case Role.STUDENT:
+            path = "/student";
+            items = StudentSideBarItems({translate, path, toggleCollapsed, topMenu});
+            break;
         case Role.LECTURER:
             path = "/lecturer";
             items = LecturerSideBarItems({translate, path, toggleCollapsed, topMenu});
