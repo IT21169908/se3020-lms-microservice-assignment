@@ -9,5 +9,12 @@ const env = {
     COURSE_SERVICE: "course_service",
     LMS_SERVICE: "lms_service",
     NOTIFY_SERVICE: "notify_service",
+
+    COURSE_RPC: "COURSE_RPC",
+    AUTH_RPC: "AUTH_RPC",
+    NOTIFY_RPC: "NOTIFY_RPC",
+    LMS_RPC: "LMS_RPC",
+    PAYMENT_RPC: "PAYMENT_RPC",
+
 };
 export default env

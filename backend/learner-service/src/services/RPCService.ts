@@ -1,6 +1,6 @@
 import * as amqplib from 'amqplib';
 import env from "../config";
-import CourseService from "./CourseService";
+import LMSService from "./LMSService";
 import {v4 as uuid4} from "uuid";
 
 
@@ -17,7 +17,7 @@ export const getChannel = async () => {
     return await amqplibConnection.createChannel();
 };
 
-export const RPCObserver = async (RPC_QUEUE_NAME: string, service: CourseService) => {
+export const RPCObserver = async (RPC_QUEUE_NAME: string, service: LMSService) => {
     const channel = await getChannel();
     await channel.assertQueue(RPC_QUEUE_NAME, {
         durable: false,

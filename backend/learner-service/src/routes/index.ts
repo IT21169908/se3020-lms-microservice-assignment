@@ -4,6 +4,8 @@ import {RabbitMQService} from "../services/RrabbitMQService";
 
 import LMSService from "../services/LMSService";
 import {LearnerRoutesInit} from "./learner";
+import {RPCObserver} from "../services/RPCService";
+import env from "../config";
 
 export async function initRoutes(router: Router) {
 
@@ -11,6 +13,7 @@ export async function initRoutes(router: Router) {
     const lmsService = new LMSService(rabbitMQService);
 
     // TODO: Listen to the events
+    await RPCObserver(env.LMS_RPC, lmsService);
     await rabbitMQService.subscribeMessage(lmsService)
 
     router.get('', (req, res) => {

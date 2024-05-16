@@ -14,6 +14,7 @@ import {getCurrentDateTime} from "../../../../utils/date-time";
 import User from "../../../../models/User";
 import {RoleName} from "../../../../enums/Role";
 import {UserService} from "../../../../services/UserService";
+import {CourseService} from "../../../../services/CourseService";
 
 interface DataType {
     key: React.Key;
@@ -106,10 +107,10 @@ const ManageUsers: React.FC = () => {
     useEffect(() => {
         async function loadUsers() {
             try {
-                const res = await UserService.getAllUsers();
+                const res = await CourseService.getMyAllEnrollments();
                 if (isMounted) {
-                    setUsers(res.data);
-                    setFilteredUsers(res.data);
+                    // setUsers(res.data);
+                    // setFilteredUsers(res.data);
                 }
             } catch (error: any) {
                 console.error(error.response.data);

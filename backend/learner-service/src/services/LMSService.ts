@@ -6,6 +6,7 @@ import {EnrollmentValidations} from "../middleware/validations/enrollment-valida
 import {validationsChecker} from "../middleware/validations/validation-handler";
 import {DEnrollment} from "../models/Enrollment.model";
 import {ErrorLogger} from "../utils/logger";
+import {Types} from "mongoose";
 
 const {AUTH_SERVICE, LMS_SERVICE} = env;
 
@@ -37,9 +38,43 @@ class LMSService {
         }
     }
 
-    private sample(parsedPayload: PayloadData): void {
+    async SubscribeRPCObserver(payload: string): Promise<object> {
+        console.log('Triggering.... CoursesService SubscribeRPCObserver');
+
+        const parsedPayload: PayloadData = JSON.parse(payload);
+
+        const {event, data} = parsedPayload;
+
+        switch (event) {
+            case 'SAMPLE':
+                return this.sample(parsedPayload);
+            case 'GET_ENROLLED_USERS':
+                return this.getEnrolledUsers(data as any);
+            default:
+                return {};
+        }
+    }
+
+    private sample(parsedPayload: PayloadData): object {
         // Implement your logic here
         console.log(`LMSService sample SubscribeEvents parsedPayload: `, parsedPayload);
+        return {
+            _id: "yt686tu8763tyyr98734",
+            name: "LMSService sample SubscribeRPCObserver",
+            credits: 5,
+            fee: 2,
+        }
+
+    }
+
+    private async getEnrolledUsers(data: { course_ids: [] }) {
+        const courseIds: Types.ObjectId[] = data.course_ids;
+        try {
+           return await this.lmsRepository.getEnrollmentsByCourses(courseIds)
+        }catch (e) {
+            return [];
+        }
+
     }
 
     public test(req: Request, res: Response, next: NextFunction) {
@@ -77,11 +112,12 @@ class LMSService {
         // res.json({authPayload: authPayload, lmsPayload: lmsPayload,});
     }
 
+
     async enrollCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
         if (validationsChecker(req, res)) {
             const ownUser = req.user;
             if (ownUser) {
-                const { learnerId, courseId } = req.body;
+                const {learnerId, courseId} = req.body;
                 const data: DEnrollment = {
                     learnerId: ownUser._id || learnerId,
                     courseId: courseId,

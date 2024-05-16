@@ -9,6 +9,10 @@ export function CourseRoutesInit(router: Router, courseService: CourseService) {
 
     // AUTH ROUTES LECTURER
     router.get('/lecturer/courses', courseService.getMyCourses.bind(courseService));
+
+    router.get('/lecturer/courses/students', courseService.getEnrolledUsers.bind(courseService));
+    // router.get('/lecturer/courses/:_id/students', courseService.getEnrolledUsers.bind(courseService));
+
     router.get('/lecturer/courses/:_id', courseService.fetchCourseValidationRules(), courseService.getById.bind(courseService));
 
     router.post('/lecturer/courses', courseService.createCourseValidationRules(), courseService.create.bind(courseService));

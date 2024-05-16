@@ -1,9 +1,9 @@
-import { Types } from "mongoose";
 import {DEnrollment, IEnrollment} from "../models/Enrollment.model";
 import Enrollment from "../schemas/Enrollment.schema";
 import {AppLogger} from "../utils/logger";
 import {ApplicationError} from "../utils/application-error";
 import {getRoleTitle} from "../utils/helpers";
+import {Types} from "mongoose";
 
 export default class LMSRepository {
 
@@ -20,6 +20,20 @@ export default class LMSRepository {
             }
             throw error;
         }
+    }
+
+    async getEnrollmentsByCourses(courseIds: Types.ObjectId[]): Promise<IEnrollment[]> {
+        const enrollments = await Enrollment.find({courseId: {$in: courseIds}});
+
+        if (enrollments.length > 0) {
+            AppLogger.info(`Got Enrollments for Courses - Count: ${enrollments.length}`);
+            return enrollments;
+        } else {
+            AppLogger.info(`Enrollments Not Found for Courses`);
+            throw new ApplicationError(`No enrollments found for the specified courses`);
+        }
+
+
     }
 
 }

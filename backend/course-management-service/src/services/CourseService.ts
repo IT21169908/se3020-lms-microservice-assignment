@@ -7,6 +7,7 @@ import {CourseValidations} from "../validations/course-validations";
 import {validationsChecker} from "../validations/validation-handler";
 import {DCourse} from "../models/CourseModel";
 import {Types} from "mongoose";
+import {RPCRequest} from "./RPCService";
 
 const {AUTH_SERVICE, LMS_SERVICE} = env
 
@@ -119,6 +120,27 @@ class CourseService {
         }).catch(next);
     }
 
+    public getEnrolledUsers(req: Request, res: Response, next: NextFunction) {
+        const user = req.user;
+        this.courseRepository.getCoursesByLecturerId(user?._id!).then(async courses => {
+            const enrollments = await RPCRequest(env.LMS_RPC, {
+                event: "GET_ENROLLED_USERS", data: {
+                    course_ids: courses.map(c => c._id)
+                }
+            })
+            if (enrollments !== null && typeof enrollments === 'object') {
+                res.sendSuccess(enrollments, "Get all courses successfully!");
+                // const enrolled_students = await RPCRequest(env.AUTH_RPC, {
+                //     event: "GET_ENROLLED_USERS", data: {
+                //         course_ids: enrollments.map(c => c._id)
+                //     }
+                // })
+            }
+            res.sendSuccess([], "Enrollments doe not exists")
+            // res.sendSuccess(courses, "Get all courses successfully!");
+        }).catch(next);
+    }
+
     public getById(req: Request, res: Response, next: NextFunction) {
         if (validationsChecker(req, res)) {
             const user = req.user;
@@ -177,9 +199,32 @@ class CourseService {
         }
     }
 
-    private sample(parsedPayload: PayloadData): void {
+    async SubscribeRPCObserver(payload: string): Promise<object> {
+        console.log('Triggering.... CoursesService SubscribeRPCObserver');
+
+        const parsedPayload: PayloadData = JSON.parse(payload);
+
+        const {event, data} = parsedPayload;
+        const {id, name, price, isActive} = data;
+
+        switch (event) {
+            case 'SAMPLE':
+                return this.sample(parsedPayload);
+            default:
+                return {};
+        }
+    }
+
+    private sample(parsedPayload: PayloadData): object {
         // Implement your logic here
         console.log(`CourseService sample SubscribeEvents parsedPayload: `, parsedPayload);
+        return {
+            _id: "yt686tu8763tyyr98734",
+            name: "CourseService sample SubscribeRPCObserver",
+            credits: 5,
+            fee: 2,
+        }
+
     }
 }
 
