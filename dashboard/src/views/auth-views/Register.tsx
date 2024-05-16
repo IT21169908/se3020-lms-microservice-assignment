@@ -1,12 +1,10 @@
-import { Select } from "antd/lib";
-import React, { useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ReactSVG } from 'react-svg';
-import { Row, Col, Form, Input, Button } from 'antd';
-import { Facebook, Twitter, Github } from 'react-bootstrap-icons';
-import { useAppDispatch } from "../../hooks/redux-hooks";
-import { signUp } from "../../redux/auth/actionCreator";
-import { AuthFormWrap } from "./styled-elements";
+import {Select} from "antd/lib";
+import React, {useCallback, useState} from 'react';
+import {Link} from 'react-router-dom';
+import {Button, Col, Form, Input, Row} from 'antd';
+import {useAppDispatch} from "../../hooks/redux-hooks";
+import {signUp} from "../../redux/auth/actionCreator";
+import {AuthFormWrap} from "./styled-elements";
 
 function SignUp() {
     const dispatch = useAppDispatch();
@@ -42,7 +40,14 @@ function SignUp() {
     // };
 
     const handleSubmit = useCallback(
-        (value: { name: string, email: string, password: string, confirmPassword: string, phone: string, role: number }) => {
+        (value: {
+            name: string,
+            email: string,
+            password: string,
+            confirmPassword: string,
+            phone: string,
+            role: number
+        }) => {
             const controller = new AbortController();
             const {signal} = controller;
             dispatch(signUp({...value, signal}));
@@ -62,39 +67,43 @@ function SignUp() {
                         <h2 className="ninjadash-authentication-top__title">Sign Up EasyLearner</h2>
                     </div>
                     <div className="ninjadash-authentication-content">
-                        <Form name="register" form={form}  onFinish={handleSubmit} layout="vertical">
-                            <Form.Item label="Name" name="name" rules={[{required: true, message: 'Please input your Full name!'}]}>
-                                <Input placeholder="Full name" />
+                        <Form name="register" form={form} onFinish={handleSubmit} layout="vertical">
+                            <Form.Item label="Name" name="name"
+                                       rules={[{required: true, message: 'Please input your Full name!'}]}>
+                                <Input placeholder="Full name"/>
                             </Form.Item>
                             <Form.Item
                                 name="email"
                                 label="Email Address"
                                 rules={[{required: true, message: 'Please input your email!', type: 'email'}]}
                             >
-                                <Input placeholder="name@example.com" />
+                                <Input placeholder="name@example.com"/>
                             </Form.Item>
                             <Form.Item
                                 label="Password"
                                 name="password"
                                 rules={[{required: true, message: 'Please input your password!'}]}
                             >
-                                <Input.Password placeholder="Password" />
+                                <Input.Password placeholder="Password"/>
                             </Form.Item>
                             <Form.Item
                                 label="Confirm Password"
                                 name="confirmPassword"
                                 rules={[{required: true, message: 'Please input your confirm password!'}]}
                             >
-                                <Input.Password placeholder="Confirm Password" />
+                                <Input.Password placeholder="Confirm Password"/>
                             </Form.Item>
                             <Form.Item
                                 label="Phone"
                                 name="phone"
                                 rules={[{required: true, message: 'Please input your phone number!'},
-                                    {pattern: /^(\+[0-9]{1,3}[- ]?)?([0-9]{10})$/, message: 'Please input a valid phone number!'}
+                                    {
+                                        pattern: /^(\+[0-9]{1,3}[- ]?)?([0-9]{10})$/,
+                                        message: 'Please input a valid phone number!'
+                                    }
                                 ]}
                             >
-                                <Input placeholder="Phone number" />
+                                <Input placeholder="Phone number"/>
                             </Form.Item>
                             <Form.Item
                                 label="Role"
@@ -103,9 +112,8 @@ function SignUp() {
                                 className={"w-100"}
                             >
                                 <Select placeholder="Select a role" style={{width: '100%'}}>
-                                    <Select.Option value={2}>Patient</Select.Option>
-                                    <Select.Option value={3}>Surgeon</Select.Option>
-                                    <Select.Option value={4}>Doctor</Select.Option>
+                                    <Select.Option value={0}>Student</Select.Option>
+                                    <Select.Option value={2}>Lecturer</Select.Option>
                                 </Select>
                             </Form.Item>
                             {/*<div className="ninjadash-auth-extra-links">*/}
@@ -118,7 +126,7 @@ function SignUp() {
                                     Create Account
                                 </Button>
                             </Form.Item>
-                           {/* <p className="ninjadash-form-divider">
+                            {/* <p className="ninjadash-form-divider">
                                 <span>Or</span>
                             </p>
                             <ul className="ninjadash-social-login">
