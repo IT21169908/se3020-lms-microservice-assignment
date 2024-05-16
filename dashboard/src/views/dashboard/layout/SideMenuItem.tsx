@@ -6,6 +6,7 @@ import {useAppDispatch, useAppSelector} from "../../../hooks/redux-hooks";
 import {RootState} from "../../../redux/store";
 import {Role} from "../../../enums/Role";
 import AdminSideBarItems from "../admin/AdminSideBarItems";
+import LecturerSideBarItems from "../lecturer/LecturerSideBarItems";
 
 function SideMenuItem({toggleCollapsed}: { toggleCollapsed: () => void }) {
 
@@ -67,7 +68,7 @@ function SideMenuItem({toggleCollapsed}: { toggleCollapsed: () => void }) {
 
 
     switch (authUser?.role) {
-        case Role.LECTURER:
+        case Role.ADMIN:
             path = "/admin";
             items = AdminSideBarItems({translate, path, toggleCollapsed, topMenu});
             break;
@@ -75,10 +76,10 @@ function SideMenuItem({toggleCollapsed}: { toggleCollapsed: () => void }) {
         //     path = "/student";
         //     items = StudentSideBarItems({translate, path, toggleCollapsed, topMenu});
         //     break;
-        // case Role.ADMIN:
-        //     path = "/surgeon";
-        //     items = AdminSideBarItems({translate, path, toggleCollapsed, topMenu});
-        //     break;
+        case Role.LECTURER:
+            path = "/lecturer";
+            items = LecturerSideBarItems({translate, path, toggleCollapsed, topMenu});
+            break;
         default:
             break;
     }
