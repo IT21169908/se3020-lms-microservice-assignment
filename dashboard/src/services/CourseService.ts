@@ -2,12 +2,11 @@ import axios from 'axios';
 import Course from "../models/Courses";
 import {AppResponse, AxiosAppResponse} from '../types/service-types/response';
 import {ApiUtils} from "../utils/api-utils";
-import IUser from "../models/User";
 import Enrollment from "../models/Enrollment";
 
 export class CourseService {
 
-    private static authToken = JSON.parse(localStorage.getItem('authToken') || '');
+    private static authToken = JSON.parse(localStorage.getItem('authToken') ?? "12");
 
     private static config = {
         headers: {

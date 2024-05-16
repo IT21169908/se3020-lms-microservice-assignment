@@ -13,7 +13,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </div>*/}
-            <div className="header-area">
+            {/*<div className="header-area">
                 <div className="container">
                     <div className="row align-items-center justify-content-center">
                         <div className="col-sm-2 col-lg-2">
@@ -1020,7 +1020,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>*/}
             {/* <div className="go-top">
                 <i className="bx bxs-up-arrow-alt"/>
                 <i className="bx bxs-up-arrow-alt"/>

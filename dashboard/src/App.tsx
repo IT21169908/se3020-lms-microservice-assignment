@@ -18,6 +18,10 @@ import GuestRoutes from "./routes/GuestRoutes";
 const {themeColor} = config;
 
 const ProviderConfig = () => {
+    const currentPath = window.location.href;
+    if (window.location.href === "http://localhost:3001/") {
+        window.location.href = 'http://localhost:3000/';
+    }
     const dispatch = useAppDispatch();
     const [isStudent, setIsStudent] = useState(false);
 
@@ -50,10 +54,7 @@ const ProviderConfig = () => {
     }, [dispatch, path]);
 
     useEffect(() => {
-        const currentPath = window.location.href;
-        if (window.location.href === "http://localhost:3001/") {
-            window.location.href = 'http://localhost:3000/';
-        }
+
         if (currentPath.includes("student/dashboard/course")) {
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('courseId');
@@ -66,7 +67,7 @@ const ProviderConfig = () => {
         }
     }, []);
 
-    console.log(isLoggedIn,authUser)
+    console.log(isLoggedIn, authUser)
     return (
         <ConfigProvider direction={rtl ? 'rtl' : 'ltr'}>
             <ThemeProvider theme={{...themeColor, rtl, topMenu, mainContent}}>

@@ -15,7 +15,7 @@ interface placeOrderType {
 
 export class OrderService {
 
-    private static authToken = JSON.parse(localStorage.getItem('authToken') || '');
+    private static authToken = JSON.parse(localStorage.getItem('authToken')  ?? "12");
 
     private static config = {
         headers: {

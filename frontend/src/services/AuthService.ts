@@ -6,7 +6,7 @@ import { UserLoginData } from '@/types/service-types/auth';
 
 export class AuthService {
 
-    private static authToken = JSON.parse(localStorage.getItem('authToken') || '');
+    private static authToken = JSON.parse(localStorage.getItem('authToken') ?? "12");
 
     private static config = {
         headers: {
