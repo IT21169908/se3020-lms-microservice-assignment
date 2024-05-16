@@ -1,5 +1,6 @@
 import http from "http";
 import https from "https";
+import {IUser} from "./models/User.model";
 
 type ObjectId = import('mongoose').Types.ObjectId;
 type Server = https.Server | http.Server;

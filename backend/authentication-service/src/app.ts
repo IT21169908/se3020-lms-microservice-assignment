@@ -11,6 +11,7 @@ import {initRoutes} from "./routes";
 import {RequestLoggerHandler} from "./middleware/request-logger";
 import {ResponseHandler} from "./middleware/response-handler";
 import {jsonErrorHandler} from "./middleware/error-handler";
+import {Authentication} from "./middleware/authentication";
 
 const expressApp = async () => {
     const isProduction = process.env.NODE_ENV === "production";
@@ -43,6 +44,7 @@ const expressApp = async () => {
         res.json("Auth service™ API").status(200);
     });
 
+    app.use('/me', Authentication.verifyToken);
     initRoutes(app, rabbitMQService)
 
     // Error Handling
