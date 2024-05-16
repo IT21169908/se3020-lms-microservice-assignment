@@ -51,6 +51,9 @@ const ProviderConfig = () => {
 
     useEffect(() => {
         const currentPath = window.location.href;
+        if (window.location.href === "http://localhost:3001/") {
+            window.location.href = 'http://localhost:3000/';
+        }
         if (currentPath.includes("student/dashboard/course")) {
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('courseId');
