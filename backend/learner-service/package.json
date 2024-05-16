@@ -23,7 +23,14 @@
     "http-errors": "^2.0.0",
     "mongoose": "^8.3.4",
     "morgan": "^1.10.0",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "passport": "^0.7.0",
+    "winston": "^3.13.0",
+    "@tsed/passport": "^7.69.2",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "moment-timezone": "^0.5.45",
+    "express-validator": "^7.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
@@ -36,6 +43,11 @@
     "@types/serve-favicon": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",
+    "@types/passport": "^1.0.16",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
+    "@types/moment-timezone": "^0.5.30",
+    "@types/express-validator": "^3.0.0",
     "eslint": "^8.57.0",
     "globals": "^15.1.0",
     "nodemon": "^3.1.0",
