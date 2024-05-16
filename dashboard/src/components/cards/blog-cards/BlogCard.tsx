@@ -24,7 +24,18 @@ type BlogCardProps = {
   theme?: string;
 };
 
-function BlogCard({ item = {}, theme = 'style-1' }: InferProps<BlogCardProps>) {
+function BlogCard({ item = {
+    id: 1,
+    title: 'Technology Change the World',
+    content: 'Lorem Ipsum is simply dummy text of the printer took a galley of type and scrambled',
+    category: 'Web Development',
+    img: '1.png',
+    author: 'Machel Bold',
+    authorImg: '1.png',
+    postDate: '15 March 2021',
+    favouriteBy: '15k',
+    viewedBy: '20k',
+  }, theme = 'style-1' }: InferProps<BlogCardProps>) {
   const { content, title, img } = item;
   return (
     <BlogCardStyleWrap>
@@ -86,20 +97,20 @@ BlogCard.propTypes = {
   theme: propTypes.string,
 };
 
-BlogCard.defaultProps = {
-  item: {
-    id: 1,
-    title: 'Technology Change the World',
-    content: 'Lorem Ipsum is simply dummy text of the printer took a galley of type and scrambled',
-    category: 'Web Development',
-    img: '1.png',
-    author: 'Machel Bold',
-    authorImg: '1.png',
-    postDate: '15 March 2021',
-    favouriteBy: '15k',
-    viewedBy: '20k',
-  },
-  theme: 'style-1',
-};
+// BlogCard.defaultProps = {
+//   item: {
+//     id: 1,
+//     title: 'Technology Change the World',
+//     content: 'Lorem Ipsum is simply dummy text of the printer took a galley of type and scrambled',
+//     category: 'Web Development',
+//     img: '1.png',
+//     author: 'Machel Bold',
+//     authorImg: '1.png',
+//     postDate: '15 March 2021',
+//     favouriteBy: '15k',
+//     viewedBy: '20k',
+//   },
+//   theme: 'style-1',
+// };
 
 export default BlogCard;

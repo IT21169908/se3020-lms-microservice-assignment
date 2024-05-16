@@ -18,7 +18,7 @@ function Cards(props: PropType) {
         isbutton,
         bodyStyle,
         headStyle,
-        border,
+        border = false,
         bodypadding,
         className,
     } = props;
@@ -67,9 +67,9 @@ function Cards(props: PropType) {
         </>
     );
 }
-
-Cards.defaultProps = {
-    border: false,
-};
+//
+// Cards.defaultProps = {
+//     border: false,
+// };
 
 export {Cards};

@@ -16,13 +16,24 @@ interface FormType {
     layout?: 'horizontal' | 'vertical'
 }
 
-function FormLayout({children, id, title, className, layout, onSubmit, onFinishFailed, initialValues, ...rest}: FormType) {
+function FormLayout({
+                        children,
+                        id,
+                        title,
+                        className,
+                        layout = 'vertical',
+                        onSubmit,
+                        onFinishFailed,
+                        initialValues,
+                        ...rest
+                    }: FormType) {
     return (
         <BasicFormWrapper>
             {layout === 'vertical' ? (
                 <VerticalFormStyleWrap>
                     <Cards title={title}>
-                        <Form id={id} name="horizontal-form" onFinish={onSubmit} onFinishFailed={onFinishFailed} initialValues={initialValues} className={className} layout={layout}>
+                        <Form id={id} name="horizontal-form" onFinish={onSubmit} onFinishFailed={onFinishFailed}
+                              initialValues={initialValues} className={className} layout={layout}>
                             {children}
                         </Form>
                     </Cards>
@@ -30,7 +41,8 @@ function FormLayout({children, id, title, className, layout, onSubmit, onFinishF
             ) : (
                 <HorizontalFormStyleWrap>
                     <Cards title="Horizontal Form">
-                        <Form id={id} name="horizontal-form" className={className} layout={layout} initialValues={initialValues}>
+                        <Form id={id} name="horizontal-form" className={className} layout={layout}
+                              initialValues={initialValues}>
                             {children}
                         </Form>
                     </Cards>
@@ -40,8 +52,8 @@ function FormLayout({children, id, title, className, layout, onSubmit, onFinishF
     );
 }
 
-FormLayout.defaultProps = {
-    layout: 'vertical',
-} as FormType
+// FormLayout.defaultProps = {
+//     layout: 'vertical',
+// } as FormType
 
 export {FormLayout};

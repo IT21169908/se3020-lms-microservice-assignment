@@ -47,7 +47,7 @@ const ProviderConfig = () => {
             controller.abort();
         };
     }, [dispatch, path]);
-
+    console.log(isLoggedIn,authUser)
     return (
         <ConfigProvider direction={rtl ? 'rtl' : 'ltr'}>
             <ThemeProvider theme={{...themeColor, rtl, topMenu, mainContent}}>

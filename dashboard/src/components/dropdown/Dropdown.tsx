@@ -6,13 +6,14 @@ import type {MenuProps} from 'antd';
 
 function Dropdown(props: DropdownProps) {
     const {
-        content,
-        placement,
+        content=menuProps,
+        placement= 'bottomRight',
         title,
         trigger,
         children,
-        style,
-        className
+        style={},
+        className='ninjadash-dropdown',
+        // action= ['hover']
     } = props;
 
     return (
@@ -50,13 +51,7 @@ const menuProps: { items: MenuProps['items'] } = {
     items: content,
 };
 
-Dropdown.defaultProps = {
-    action: ['hover'],
-    placement: 'bottomRight',
-    content: menuProps,
-    style: {},
-    className: 'ninjadash-dropdown',
-};
+
 
 
 export {Dropdown};

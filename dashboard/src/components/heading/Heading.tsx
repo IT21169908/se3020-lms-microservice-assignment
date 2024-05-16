@@ -5,7 +5,7 @@ import * as headings from './styled-elements';
 
 function Heading(props: HeadingProps) {
     const {
-        as,
+        as='h1',
         children,
         className,
         id
@@ -20,9 +20,9 @@ function Heading(props: HeadingProps) {
     );
 }
 
-Heading.defaultProps = {
-    as: 'h1',
-};
+// Heading.defaultProps = {
+//     as: 'h1',
+// };
 
 Heading.propTypes = {
     as: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']),

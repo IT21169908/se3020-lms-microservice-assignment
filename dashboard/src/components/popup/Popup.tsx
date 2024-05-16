@@ -1,26 +1,10 @@
 import React from 'react';
-import { Check } from "react-bootstrap-icons";
+import {Check} from "react-bootstrap-icons";
 import {Link} from 'react-router-dom';
 import {Content, PopoverStyle, Title} from './styled-elements';
 import {PopupProps} from "../../types/popup-types";
 
-function Popover(props: PopupProps) {
-    const {content, placement, title, action, children} = props;
-    const content1 = <Content>{content}</Content>;
-
-    return (
-        <PopoverStyle
-            placement={placement}
-            title={title && <Title>{title}</Title>}
-            content={content1}
-            trigger={action}
-        >
-            {children}
-        </PopoverStyle>
-    );
-}
-
-const content = (
+const contentProp = (
     <>
         <Link to="#">
             <Check/>
@@ -37,11 +21,27 @@ const content = (
     </>
 );
 
-Popover.defaultProps = {
-    action: 'hover',
-    placement: 'bottom',
-    content,
-};
+function Popover(props: PopupProps) {
+    const {content = contentProp, placement = 'bottom', title, action = 'hover', children} = props;
+    const content1 = <Content>{content}</Content>;
+
+    return (
+        <PopoverStyle
+            placement={placement}
+            title={title && <Title>{title}</Title>}
+            content={content1}
+            trigger={action}
+        >
+            {children}
+        </PopoverStyle>
+    );
+}
+
+// Popover.defaultProps = {
+//     action: 'hover',
+//     placement: 'bottom',
+//     content:contentProp,
+// };
 
 
 export {Popover};
