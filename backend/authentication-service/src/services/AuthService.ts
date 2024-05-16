@@ -82,7 +82,7 @@ class AuthService {
     }
 
     async loginUser(req: Request, res: Response, next: NextFunction) {
-        const {email, password, signedUpAs, remember} = req.body;
+        const {email, password, signedUpAs = SignedUpAs.EMAIL, remember} = req.body;
 
         if (validationsChecker(req, res)) {
             this.userRepository.authenticateUser(email, password, signedUpAs, this.authTokenValidity(remember))
