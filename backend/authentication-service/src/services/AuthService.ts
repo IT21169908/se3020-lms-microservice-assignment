@@ -271,6 +271,7 @@ class AuthService {
 
     async getSelf(req: Request, res: Response, next: NextFunction) {
         const ownUser = req.user as IUser;
+        console.log(ownUser)
         if (ownUser) {
             this.userRepository.getUser(ownUser._id).then((user: IUser) => {
                 res.sendSuccess(user);
