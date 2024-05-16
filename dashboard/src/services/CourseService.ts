@@ -2,6 +2,8 @@ import axios from 'axios';
 import Course from "../models/Courses";
 import {AppResponse, AxiosAppResponse} from '../types/service-types/response';
 import {ApiUtils} from "../utils/api-utils";
+import IUser from "../models/User";
+import Enrollment from "../models/Enrollment";
 
 export class CourseService {
 
@@ -23,9 +25,9 @@ export class CourseService {
         }
     }
 
-    static async getMyAllEnrollments(): Promise<AppResponse<Course[]>> {
+    static async getMyAllEnrollments(): Promise<AppResponse<Enrollment[]>> {
         const ep = ApiUtils.lecturerCourseMSServiceUrl('courses/students');
-        const response = await axios.get<Partial<Course>, AxiosAppResponse<Course[]>>(ep, this.config);
+        const response = await axios.get<Partial<Enrollment>, AxiosAppResponse<Enrollment[]>>(ep, this.config);
         if (response.data.success) {
             return response.data;
         } else {

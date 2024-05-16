@@ -36,7 +36,7 @@ const LecturerSideBarItems = ({translate, path, toggleCollapsed, topMenu}: {
         ),
         getItem(
             <NavLink onClick={toggleCollapsed} to={`${path}/users`}>
-                {translate("Users")}
+                {translate("Enrollments")}
                 <span className="badge badge-primary menuItem">2</span>
             </NavLink>,
             'users',

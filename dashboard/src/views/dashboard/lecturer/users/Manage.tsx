@@ -1,40 +1,37 @@
 import React, {ReactNode, useEffect, useState} from 'react';
-import {Button, Col, Input, message, Popconfirm, Row, Table} from 'antd';
+import {Button, Col, Input, Row, Table} from 'antd';
 import type {ColumnsType} from 'antd/es/table';
 import {PageHeader} from "../../../../components/breadcrumbs/DashboardBreadcrumb";
-import {Download, HouseDoor, Pencil, Plus, Search, Trash2} from "react-bootstrap-icons";
+import {Download, HouseDoor, Search} from "react-bootstrap-icons";
 import {BorderLessHeading, Main, TopToolBox} from "../../../../components/styled-components/styled-containers";
 import {Cards} from "../../../../components/cards/frame/CardFrame";
-import {Link} from "react-router-dom";
 import {NotFoundWrapper} from "../../layout/style";
 import Heading from "../../../../components/heading/Heading";
 import JsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import {getCurrentDateTime} from "../../../../utils/date-time";
-import User from "../../../../models/User";
-import {RoleName} from "../../../../enums/Role";
-import {UserService} from "../../../../services/UserService";
+import Enrollment from "../../../../models/Enrollment";
 import {CourseService} from "../../../../services/CourseService";
 
 interface DataType {
-    key: React.Key;
+    key?: React.Key;
     _id?: string;
-    name: string;
-    email: string;
-    phone?: string;
-    role: string;
-    lastLoggedIn?: string;
+    courseId: string;
+    createdAt: string;
+    enrollmentDate?: string;
+    learnerId: string;
+    status?: string;
     action: ReactNode;
 }
 
 const dataTableColumn: ColumnsType<DataType> = [
     //{title: 'Id', dataIndex: '_id', key: '_id'},
     {title: '_id', dataIndex: '_id', key: '_id'},
-    {title: 'name', dataIndex: 'name', key: 'name'},
-    {title: 'email', dataIndex: 'email', key: 'email'},
-    {title: 'phone', dataIndex: 'phone', key: 'phone'},
-    {title: 'role', dataIndex: 'role', key: 'role'},
-    {title: 'lastLoggedIn', dataIndex: 'lastLoggedIn', key: 'lastLoggedIn'},
+    {title: 'courseId', dataIndex: 'courseId', key: 'courseId'},
+    {title: 'createdAt', dataIndex: 'createdAt', key: 'createdAt'},
+    {title: 'enrollmentDate', dataIndex: 'enrollmentDate', key: 'enrollmentDate'},
+    {title: 'learnerId', dataIndex: 'learnerId', key: 'learnerId'},
+    {title: 'status', dataIndex: 'status', key: 'status'},
     {
         title: 'Action',
         dataIndex: 'action',
@@ -47,41 +44,41 @@ const dataTableColumn: ColumnsType<DataType> = [
 const BreadcrumbItem = [
     {
         title: <div className="d-flex align-items-center"><HouseDoor/> &nbsp; Home</div>,
-        href: '/admin',
+        href: '/lecturer',
     },
     {
-        title: 'Manage Users',
+        title: 'Manage Enrollments',
     },
 ];
 
 const ManageUsers: React.FC = () => {
 
-    const [users, setUsers] = useState<User[]>([]);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<Enrollment[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<Enrollment[]>([]);
     const [tableDataSource, setTableDataSource] = useState<DataType[]>([]);
 
-    const formatDataSource = (users: User[]): DataType[] => {
+    const formatDataSource = (users: Enrollment[]): DataType[] => {
         return users.map((user) => {
             const {
                 _id,
-                name,
-                email,
-                phone,
-                role,
-                lastLoggedIn
+                courseId,
+                createdAt,
+                enrollmentDate,
+                learnerId,
+                status
             } = user;
 
-            return {
-                key: _id,
+            const record: DataType = {
+                // key: _id,
                 _id,
-                name,
-                email,
-                phone,
-                role: RoleName[role],
-                lastLoggedIn,
+                courseId,
+                createdAt,
+                enrollmentDate,
+                learnerId,
+                status,
                 action: (
                     <div className="table-actions">
-                        <Link
+                        {/* <Link
                             className="btn btn-sm btn-warning text-white me-1"
                             to={`/admin/users/${_id}/edit`}
                         >
@@ -97,10 +94,11 @@ const ManageUsers: React.FC = () => {
                             <Link className="btn btn-sm btn-danger text-white" to="#">
                                 <Trash2/>
                             </Link>
-                        </Popconfirm>
+                        </Popconfirm>*/}
                     </div>
                 ),
             };
+            return record;
         });
     };
 
@@ -109,8 +107,8 @@ const ManageUsers: React.FC = () => {
             try {
                 const res = await CourseService.getMyAllEnrollments();
                 if (isMounted) {
-                    // setUsers(res.data);
-                    // setFilteredUsers(res.data);
+                    setUsers(res.data);
+                    setFilteredUsers(res.data);
                 }
             } catch (error: any) {
                 console.error(error.response.data);
@@ -131,22 +129,6 @@ const ManageUsers: React.FC = () => {
     }, [filteredUsers])
 
 
-    const deleteUser = async (_id: string) => {
-        try {
-            const res = await UserService.deleteUser(_id);
-            if (res.success) {
-                message.success(`${res.message}`);
-                // TODO: REFACTOR this. Do not use filter, when large no of records exist
-                const updatedUsers = users.filter(user => user._id !== _id);
-                setUsers(updatedUsers);
-                setTableDataSource(formatDataSource(updatedUsers));
-            }
-        } catch (error: any) {
-            message.error(`${error.response.data.error || error.response.data.message}`)
-            console.log(error.response.data.error)
-        }
-    }
-
     const generatePDF = (): void => {
         const doc = new JsPDF();
 
@@ -155,15 +137,14 @@ const ManageUsers: React.FC = () => {
 
         // Create a table
         const tableData = users.map((user) => [
-            user._id,
-            user.name,
-            user.email,
-            user.phone,
-            RoleName[user.role],
-            user.lastLoggedIn,
+            user.courseId,
+            user.createdAt,
+            user.enrollmentDate,
+            user.learnerId,
+            user.status,
         ]);
         autoTable(doc, {
-            head: [['_id', 'name', 'email', 'phone', 'RoleName', 'lastLoggedIn']],
+            head: [['_id', 'courseId', 'createdAt', 'enrollmentDate', 'learnerId', 'status']],
             body: tableData,
         })
 
@@ -200,10 +181,10 @@ const ManageUsers: React.FC = () => {
                                 <>
                                     <Button className="btn btn-warning h-auto me-2" onClick={generatePDF}>
                                         <Download className="me-2"/> Export PDF
-                                    </Button>
-                                    <Link className="btn btn-primary h-auto" type="link" to="/admin/users/create">
+                                    </Button>{/* <Link className="btn btn-primary h-auto" type="link" to="/admin/users/create">
                                         <Plus/> Add New
-                                    </Link>
+                                    </Link>*/}
+
                                 </>
                             }>
                                 {
