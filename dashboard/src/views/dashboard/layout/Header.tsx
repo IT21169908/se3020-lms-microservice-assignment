@@ -26,7 +26,7 @@ function Header({rtl, topMenu, layoutMode, toggleCollapsed, collapsed, onShowHid
                     <div className="ninjadash-header-content__left">
                         <div className="navbar-brand align-cener-v">
                             <Link to="/admin" className={topMenu && window.innerWidth > 991 ? 'ninjadash-logo top-menu' : 'ninjadash-logo'}>
-                                <img src={layoutMode === 'lightMode' ? logoDark : logoWhite} alt=""/>
+                                <img src={layoutMode === 'lightMode' ? logoDark : logoWhite} alt="" style={{width: '20%'}}/>
                             </Link>
                             {!topMenu || window.innerWidth <= 991 ? (
                                 <Button type="link" onClick={toggleCollapsed}>
