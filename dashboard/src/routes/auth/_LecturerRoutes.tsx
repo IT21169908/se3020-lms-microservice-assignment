@@ -4,10 +4,10 @@ import DashboardLayout from "../../views/dashboard/layout/DashboardLayout";
 import UpdateUser from "../../views/dashboard/lecturer/users/UpdateUser";
 
 const NotFound = lazy(() => import('../../views/errors/NotFound'));
-const CreateSpectacle = lazy(() => import("../../views/dashboard/lecturer/spectacles/Create"));
-const EditSpectacle = lazy(() => import("../../views/dashboard/lecturer/spectacles/Create"));
+const CourseCreate = lazy(() => import("../../views/dashboard/lecturer/courses/Create"));
+const EditCourse = lazy(() => import("../../views/dashboard/lecturer/courses/Create"));
 const ManageUsers = lazy(() => import("../../views/dashboard/lecturer/users/Manage"));
-const ManageSpectacles = lazy(() => import("../../views/dashboard/lecturer/spectacles/Manage"));
+const ManageCourses = lazy(() => import("../../views/dashboard/lecturer/courses/Manage"));
 const Dashboard = lazy(() => import("../../views/dashboard/Dashboard"));
 
 function LecturerRoutes() {
@@ -20,9 +20,9 @@ function LecturerRoutes() {
                 <Route path="/users" element={<ManageUsers/>}/>
                 <Route path="/users/:user_id/edit" element={<UpdateUser enableEdit/>}/>
 
-                <Route path="/courses" element={<ManageSpectacles/>}/>
-                <Route path="/courses/create" element={<CreateSpectacle enableEdit={false}/>}/>
-                <Route path="/courses/:spectacle/edit" element={<EditSpectacle enableEdit/>}/>
+                <Route path="/courses" element={<ManageCourses/>}/>
+                <Route path="/courses/create" element={<CourseCreate enableEdit={false}/>}/>
+                <Route path="/courses/:spectacle/edit" element={<EditCourse enableEdit/>}/>
 
                 <Route path="/*" element={<NotFound/>}/>
             </Routes>

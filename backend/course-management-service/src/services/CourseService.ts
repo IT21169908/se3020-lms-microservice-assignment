@@ -63,7 +63,7 @@ class CourseService {
             CourseValidations.description(),
             CourseValidations.credits(),
             CourseValidations.fee(),
-            CourseValidations.lecturerId(),
+            // CourseValidations.lecturerId(),
         ];
     }
 
@@ -80,7 +80,7 @@ class CourseService {
         if (validationsChecker(req, res)) {
             const user = req.user;
 
-            const {name, code, fee, description, credits, lecturer_id, status} = req.body;
+            const {name, code, fee, description, credits, status} = req.body;
             const data: DCourse = {
                 status: status,
                 name: name,
@@ -88,7 +88,7 @@ class CourseService {
                 fee: fee,
                 description: description,
                 credits: credits,
-                lecture_id: lecturer_id
+                lecture_id: user?._id!
             };
             this.courseRepository.createCourse(data, user).then(course => {
                 res.sendSuccess(course, "Course created successfully!");

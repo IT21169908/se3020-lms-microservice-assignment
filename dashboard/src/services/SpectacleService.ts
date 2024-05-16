@@ -3,7 +3,7 @@ import Spectacle from "../models/Spectacle";
 import {AppResponse, AxiosAppResponse} from '../types/service-types/response';
 import {ApiUtils} from "../utils/api-utils";
 
-export class SpectacleService {
+export class CourseService {
 
     private static authToken = JSON.parse(localStorage.getItem('authToken') || '');
 
