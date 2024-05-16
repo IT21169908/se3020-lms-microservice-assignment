@@ -2,39 +2,22 @@ import {Router} from "express";
 import createHttpError from "http-errors";
 import {RabbitMQService} from "../services/RrabbitMQService";
 
+import LMSService from "../services/LMSService";
+import {LearnerRoutesInit} from "./learner";
 
-import env from "../config";
-import CourseService from "../services/LMSService";
-import {StudentRoutesInit} from "./student";
+export async function initRoutes(router: Router) {
 
-const {AUTH_SERVICE, COURSE_SERVICE} = env
-
-// TODO: test purposes
-export function initRoutes(router: Router, rabbitMQ: RabbitMQService) {
-
-    const courseService = new CourseService();
+    const rabbitMQService = await RabbitMQService.getInstance()
+    const lmsService = new LMSService(rabbitMQService);
 
     // TODO: Listen to the events
-    rabbitMQ.subscribeMessage(courseService)
+    await rabbitMQService.subscribeMessage(lmsService)
 
-    router.get('/test', (req, res) => {
-
-        const coursePayload = {
-            event: "SAMPLE",
-            data: {
-                id: '65ffef24021037df10627bbd',
-                name: 'SE3040',
-                price: '295000',
-                isActive: true,
-            }
-        }
-        // TODO: Publish service events
-        rabbitMQ.publishMessage(COURSE_SERVICE, JSON.stringify(coursePayload))
-        StudentRoutesInit(router, courseService);
-
-
-        res.json({coursePayload, message: "LMS SERVICE TEST ROUTE™ API"});
+    router.get('', (req, res) => {
+        res.json("Learner service™ API").status(200);
     });
+
+    LearnerRoutesInit(router, lmsService);
 
 
     /* INVALID REQUESTS */

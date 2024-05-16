@@ -1,6 +1,24 @@
-import {Types} from "mongoose";
+import {RabbitMQService} from "./RrabbitMQService";
+import LMSRepository from "../repository/LMSRepository";
+import {NextFunction, Request, Response} from "express";
+import env from "../config";
+import {EnrollmentValidations} from "../middleware/validations/enrollment-validations";
+import {validationsChecker} from "../middleware/validations/validation-handler";
+import {DEnrollment} from "../models/Enrollment.model";
+import {ErrorLogger} from "../utils/logger";
+
+const {AUTH_SERVICE, LMS_SERVICE} = env;
 
 class LMSService {
+
+    private readonly rabbitMQ: RabbitMQService;
+    private readonly lmsRepository: LMSRepository;
+
+    constructor(rabbitMQ: RabbitMQService) {
+        this.lmsRepository = new LMSRepository()
+        this.rabbitMQ = rabbitMQ;
+        this.test = this.test.bind(this);
+    }
 
     async SubscribeEvents(payload: string): Promise<void> {
         console.log('Triggering.... LMSService Events');
@@ -24,94 +42,67 @@ class LMSService {
         console.log(`LMSService sample SubscribeEvents parsedPayload: `, parsedPayload);
     }
 
+    public test(req: Request, res: Response, next: NextFunction) {
+        const user = req.user;
 
-     async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
-        const ownUser = req.user as IUser;
-        if (ownUser) {
-            AppLogger.info(`Get all enrolles`);
-            await EnrollDao.getEnrolls(ownUser).then(enrolles => {
-                res.sendSuccess(enrolles, "Get all enrolles successfully!");
-            }).catch(next);
-        } else {
-            ErrorLogger.error(`Get all courses: Illegal attempt`);
-            res.sendError(`Illegal attempt!`, 403);
+        const authPayload = {
+            event: "LOGIN",
+            data: {
+                "_id": user?._id || null,
+                "name": user?.name || null,
+                "email": user?.email || null,
+                "role": user?.role || null,
+                "permissions": user?.permissions || null,
+                "signedUpAs": user?.signedUpAs || null,
+                "phone": user?.phone || null,
+                "lastLoggedIn": user?.lastLoggedIn || null,
+            }
         }
+
+        const lmsPayload = {
+            event: "SAMPLE",
+            data: {
+                "_id": "6600535b01e929e77376118d",
+                "user_id": "66004de7d5dd17b8991741e5",
+                "course_id": "65ffef1b021037df10627bba",
+                "status": "approved",
+            }
+        }
+
+        // TODO: Publish service events
+        this.rabbitMQ.publishMessage(AUTH_SERVICE, JSON.stringify(authPayload))
+        this.rabbitMQ.publishMessage(LMS_SERVICE, JSON.stringify(lmsPayload))
+
+        res.sendSuccess({authPayload: authPayload, lmsPayload: lmsPayload,}, "LEARNER SERVICE TEST ROUTE™ API");
+        // res.json({authPayload: authPayload, lmsPayload: lmsPayload,});
     }
 
-     async getEnroll(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async enrollCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
         if (validationsChecker(req, res)) {
-            const ownUser = req.user as IUser;
+            const ownUser = req.user;
             if (ownUser) {
-                const enrollId = req.params.enrollId as unknown as Types.ObjectId;
-                await EnrollDao.getEnrollById(enrollId, ownUser).then(enroll => {
-                    res.sendSuccess(enroll, "Get enroll by ID successfully!");
-                }).catch(next);
-            } else {
-                ErrorLogger.error(`Get enroll: Illegal attempt`);
-                res.sendError(`Illegal attempt!`, 403);
-            }
-        }
-    }
-
-     async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-        if (validationsChecker(req, res)) {
-            const ownUser = req.user as IUser;
-            if (ownUser && [Role.ADMIN, Role.LECTURER].includes(parseInt(ownUser.role.toString()))) {
-                const { session, time, date, courseId, facultyId, location } = req.body;
-                const data: DEnroll = {
-                    session: session,
+                const { learnerId, courseId } = req.body;
+                const data: DEnrollment = {
+                    learnerId: ownUser._id || learnerId,
                     courseId: courseId,
-                    time: time,
-                    date: date,
-                    facultyId: facultyId,
-                    location: location,
+                    status: "enrolled",
+                    enrollmentDate: new Date,
                 };
-                await EnrollDao.createEnroll(data, ownUser).then(enroll => {
-                    res.sendSuccess(enroll, "Enroll added successfully!");
+                await this.lmsRepository.enrollLearner(data, ownUser).then(enrollment => {
+                    res.sendSuccess(enrollment, "Learner enrolled successfully!");
                 }).catch(next);
             } else {
-                ErrorLogger.error(`Create enroll: Illegal attempt`);
+                ErrorLogger.error(`Enroll learner: Illegal attempt`);
                 res.sendError(`Illegal attempt!`, 403);
             }
         }
     }
 
-     async update(req: Request, res: Response, next: NextFunction): Promise<void> {
-        if (validationsChecker(req, res)) {
-            const ownUser = req.user as IUser;
-            if (ownUser && [Role.ADMIN, Role.LECTURER].includes(parseInt(ownUser.role.toString()))) {
-                const { enrollId, session, date, time, courseId, facultyId, location } = req.body;
-                const enrollDetails: Partial<DEnroll> = {
-                    session: session,
-                    courseId: courseId,
-                    time: time,
-                    date: date,
-                    facultyId: facultyId,
-                    location: location,
-                };
-                await EnrollDao.updateEnroll(enrollId, enrollDetails, ownUser).then(enroll => {
-                    res.sendSuccess(enroll, "Enroll updated successfully!");
-                }).catch(next);
-            } else {
-                ErrorLogger.error(`Update enroll: Illegal attempt`);
-                res.sendError(`Illegal attempt!`, 403);
-            }
-        }
-    }
-
-     async remove(req: Request, res: Response, next: NextFunction): Promise<void> {
-        if (validationsChecker(req, res)) {
-            const ownUser = req.user as IUser;
-            if (ownUser && [Role.ADMIN, Role.LECTURER].includes(parseInt(ownUser.role.toString()))) {
-                const enrollId = req.params.enrollId as unknown as Types.ObjectId;
-                await EnrollDao.deleteEnroll(enrollId as Types.ObjectId, ownUser).then(enroll => {
-                    res.sendSuccess(enroll, "Enroll deleted successfully!");
-                }).catch(next);
-            } else {
-                ErrorLogger.error(`Remove enroll: Illegal attempt`);
-                res.sendError(`Illegal attempt!`, 403);
-            }
-        }
+    public enrollmentValidationRules() {
+        return [
+            // EnrollmentValidations.learnerId(),
+            EnrollmentValidations.courseId(),
+        ];
     }
 
 }
