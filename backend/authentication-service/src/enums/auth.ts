@@ -8,11 +8,11 @@ export namespace Role {
     export function getPermissions(role: Role): Permission[] {
         switch (role) {
             case Role.STUDENT:
-                return [Permission.VIEW_TIMETABLE, Permission.ENROLL_COURSE];
+                return [Permission.ENROLL_COURSE];
             case Role.ADMIN:
                 return Object.values(Permission);
             case Role.LECTURER:
-                return [Permission.UPDATE_COURSE, Permission.VIEW_TIMETABLE, Permission.BOOK_CLASS_ROOM];
+                return [Permission.UPDATE_COURSE];
             default:
                 return [];
         }
@@ -38,8 +38,6 @@ export enum Permission {
     UPDATE_COURSE = "UPDATE_COURSE",
     DELETE_COURSE = "DELETE_COURSE",
     ENROLL_COURSE = "ENROLL_COURSE",
-    VIEW_TIMETABLE = "VIEW_TIMETABLE",
-    BOOK_CLASS_ROOM = "BOOK_CLASS_ROOM"
 }
 
 export enum SignedUpAs {

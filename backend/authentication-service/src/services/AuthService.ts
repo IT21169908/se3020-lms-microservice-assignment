@@ -1,16 +1,30 @@
 import {RabbitMQService} from "./RrabbitMQService";
 import env from "../config";
 import {NextFunction, Request, Response} from "express";
-import {ObjectId, Types} from "mongoose";
+import {ObjectId} from "mongoose";
 
-import {Permission, Role} from "../enums/auth";
+import {Permission, Role, SignedUpAs} from "../enums/auth";
+import {validationsChecker} from "../middleware/validations/validation-handler";
+import UserRepository from "../repository/UserRepository";
+import {AuthUserData} from "../types/util-types";
+import {Time} from "../enums/time";
+import {AppLogger, ErrorLogger} from "../utils/logging";
+import {DStudent} from "../models/Student.model";
+import {DUser, IUser} from "../models/User.model";
+import Student from "../schemas/Student.schema";
+import {DLecturer} from "../models/Lecturer.model";
+import Lecturer from "../schemas/Lecturer.schema";
+import {DAdmin} from "../models/Admin.model";
+import Admin from "../schemas/Admin.schema";
 
 class AuthService {
 
-    private rabbitMQ: RabbitMQService;
+    private readonly rabbitMQ: RabbitMQService;
+    private readonly userRepository: UserRepository;
 
     constructor(rabbitMQ: RabbitMQService) {
         this.rabbitMQ = rabbitMQ;
+        this.userRepository = new UserRepository()
     }
 
     async SubscribeEvents(payload: string): Promise<void> {
@@ -21,17 +35,16 @@ class AuthService {
         const {event, data} = parsedPayload;
 
         switch (event) {
-            case 'LOGIN':
-                this.login(parsedPayload);
+            case 'SAMPLE':
+                this.sample(parsedPayload);
                 break;
             default:
                 break;
         }
     }
 
-    private login(parsedPayload: PayloadData): void {
-        // Implement your logic here
-        console.log(`user login: `, parsedPayload);
+    public sample(payload: any) {
+        console.log("Sample event");
     }
 
     public tester(req: Request, res: Response, next: NextFunction) {
@@ -57,8 +70,8 @@ class AuthService {
                 ],
             }
         }
-        //
-        // // TODO: Publish service events
+
+        //Publish service events
         try {
             this.rabbitMQ.publishMessage(env.COURSE_SERVICE, JSON.stringify(coursePayload))
             this.rabbitMQ.publishMessage(env.NOTIFY_SERVICE, JSON.stringify(notifyPayload))
@@ -66,31 +79,45 @@ class AuthService {
             res.sendError({err: e, message: "AUTH SERVICE TEST ROUTE™ API Err"});
         }
         res.sendSuccess({coursePayload, notifyPayload,}, "AUTH SERVICE TEST ROUTE™ API");
-
-        // res.json({coursePayload, notifyPayload, message: "AUTH SERVICE TEST ROUTE™ API"});
     }
 
+    async loginUser(req: Request, res: Response, next: NextFunction) {
+        const {email, password, signedUpAs, remember} = req.body;
 
-     async registerUser(req: Request, res: Response, next: NextFunction) {
         if (validationsChecker(req, res)) {
-            const { role, email, superAdminToken = null } = req.body;
-            const user = await UserDao.getUserByEmail(email);
+            this.userRepository.authenticateUser(email, password, signedUpAs, this.authTokenValidity(remember))
+                .then(async (data: AuthUserData) => {
+                    res.cookie('token', data.token, {
+                        httpOnly: true,
+                        secure: false,
+                        maxAge: Time.getDaysIn(Time.Milliseconds, this.authTokenValidity(remember))
+                    });
+                    res.sendSuccess(data, `User logged as ${Role.getTitle(data.user.role)}!`);
+                })
+                .catch(next);
+        }
+    }
+
+    async registerUser(req: Request, res: Response, next: NextFunction) {
+        if (validationsChecker(req, res)) {
+            const {role, email, superAdminToken = null} = req.body;
+            const user = await this.userRepository.getUserByEmail(email);
             AppLogger.info(`New user tried to register as ${role} by ${email}`);
 
             if (user) {
-                AppLogger.error(`User already exits!`);
-                res.sendError('User Already Exits!', 409);
+                AppLogger.error(`User already exists!`);
+                res.sendError('User Already Exists!', 409);
             } else {
                 if (role === Role.STUDENT) {
                     try {
-                        await StudentEp.register(req, res, next);
+                        await this.registerStudent(req, res, next);
                     } catch (e) {
                         ErrorLogger.error(`User registration: ${e}`);
                         res.sendError(e);
                     }
                 } else if (role === Role.LECTURER) {
                     try {
-                        await FacultyEp.register(req, res, next);
+                        await this.registerLecturer(req, res, next);
                     } catch (e) {
                         ErrorLogger.error(`User registration: ${e}`);
                         res.sendError(e);
@@ -98,7 +125,7 @@ class AuthService {
                 } else if (role === Role.ADMIN) {
                     if (superAdminToken) {
                         try {
-                            await AdminEp.register(req, res, next);
+                            await this.registerAdmin(req, res, next);
                         } catch (e) {
                             ErrorLogger.error(`User registration: ${e}`);
                             res.sendError(e);
@@ -115,44 +142,96 @@ class AuthService {
         }
     }
 
-     async getAll(req: Request, res: Response, next: NextFunction) {
-        const ownUser = req.user as IUser;
-        if (ownUser) {
-            AppLogger.info(`Get all users`);
-            await UserDao.getAllUsers(ownUser).then(user => {
-                res.sendSuccess(user, "Get all Users successfully!");
+    async registerStudent(req: Request, res: Response, next: NextFunction) {
+        const {_id: id, role, name, email, password, studentId, remember} = req.body;
+        const data: DStudent = {
+            studentId: studentId,
+            name: name,
+            email: email,
+            password: password,
+            signedUpAs: SignedUpAs.EMAIL,
+            lastLoggedIn: new Date(),
+            // role: Role.STUDENT, // Role set in schema
+            permissions: Role.getPermissions(Role.STUDENT),
+        };
+        this.createStudentProfile(data, !!remember).then(async (data: AuthUserData) => {
+            AppLogger.info(`User registered as ${Role.getTitle(role)} ID: ${id}`);
+            res.sendSuccess(data, `User Registered as ${Role.getTitle(role)}!`);
+        }).catch(next);
+    }
+
+    async createStudentProfile(data: DUser & Partial<DStudent>, remember: boolean): Promise<AuthUserData> {
+        const iStudent = new Student(data);
+        const student = await iStudent.save();
+        AppLogger.info(`Create profile for user ID: ${student._id}`);
+        // TODO fire event to send emails
+        return await this.userRepository.authenticateUser(data.email, data.password, data.signedUpAs, this.authTokenValidity(remember));
+    }
+
+    async registerLecturer(req: Request, res: Response, next: NextFunction) {
+        const {_id: id, role, name, email, password, facultyId, remember} = req.body;
+        const data: DLecturer = {
+            lecturerId: facultyId,
+            name: name,
+            email: email,
+            password: password,
+            signedUpAs: SignedUpAs.EMAIL,
+            lastLoggedIn: new Date(),
+            // role: Role.FACULTY, // Role set in schema
+            permissions: Role.getPermissions(Role.LECTURER),
+        };
+        this.createLecturerProfile(data, !!remember).then(async (data: AuthUserData) => {
+            AppLogger.info(`User registered as ${Role.getTitle(role)} ID: ${id}`);
+            res.sendSuccess(data, `User Registered as ${Role.getTitle(role)}!`);
+        }).catch(next);
+    }
+
+    async createLecturerProfile(data: DUser & Partial<DLecturer>, remember: boolean): Promise<AuthUserData> {
+        const iFaculty = new Lecturer(data);
+        const faculty = await iFaculty.save();
+        AppLogger.info(`Create profile for user ID: ${faculty._id}`);
+        // TODO fire event to send emails
+        return await this.userRepository.authenticateUser(data.email, data.password, data.signedUpAs, this.authTokenValidity(remember));
+    }
+
+    async registerAdmin(req: Request, res: Response, next: NextFunction) {
+        const {_id: id, role, name, email, password, adminId, nic, superAdminToken, remember} = req.body;
+        if (superAdminToken && superAdminToken === process.env.SUPER_ADMIN_TOKEN) {
+            AppLogger.info(`User registering by super admin token (Email: ${email})`);
+            const data: DAdmin = {
+                nic: nic,
+                adminId: adminId,
+                name: name,
+                email: email,
+                password: password,
+                signedUpAs: SignedUpAs.EMAIL,
+                lastLoggedIn: new Date(),
+                // role: Role.ADMIN, // Role set in schema
+                permissions: Role.getPermissions(Role.ADMIN),
+            };
+            this.createAdminProfile(data, !!remember).then(async (data: AuthUserData) => {
+                AppLogger.info(`User registered as ${Role.getTitle(role)} ID: ${id}`);
+                res.sendSuccess(data, `User Registered as ${Role.getTitle(role)}!`);
             }).catch(next);
         } else {
-            ErrorLogger.error(`Get all users: Illegal attempt`);
+            AppLogger.error(`Try user registering as Admin (Token: ${superAdminToken})`);
+            ErrorLogger.error(`User registering as Admin: Illegal attempt`);
             res.sendError(`Illegal attempt!`, 403);
         }
     }
 
-    getSelf(req: Request, res: Response, next: NextFunction) {
-        const ownUser = req.user as IUser;
-        if (ownUser) {
-            UserDao.getUser(ownUser._id).then((user: IUser) => {
-                res.sendSuccess(user);
-            }).catch(next);
-        } else {
-            ErrorLogger.error(`Get self: Illegal attempt`);
-            res.sendError(`Illegal attempt!`, 403);
-        }
+    async createAdminProfile(data: DUser & Partial<DAdmin>, remember: boolean): Promise<AuthUserData> {
+        const iAdmin = new Admin(data);
+        const admin = await iAdmin.save();
+        AppLogger.info(`Create profile for user ID: ${admin._id}`);
+        // TODO fire event to send emails
+        return await this.userRepository.authenticateUser(data.email, data.password, data.signedUpAs, this.authTokenValidity(remember));
     }
 
-    getUser(req: Request, res: Response, next: NextFunction) {
-        if (validationsChecker(req, res)) {
-            const userId = req.params._id as unknown as Types.ObjectId;
-            UserDao.getUser(userId).then(user => {
-                res.sendSuccess(user, "Get user by ID successfully!");
-            }).catch(next);
-        }
-    }
-
-     async updateSelf(req: Request, res: Response, next: NextFunction) {
+    async updateSelf(req: Request, res: Response, next: NextFunction) {
         if (validationsChecker(req, res)) {
             const {email, phone, name} = req.body;
-            const emailCheckUser = await UserDao.getUserByEmail(email);
+            const emailCheckUser = await this.userRepository.getUserByEmail(email);
             const ownUser = req.user as IUser;
 
             if (ownUser) {
@@ -165,7 +244,7 @@ class AuthService {
                         phone: phone,
                         name: name,
                     };
-                    await UserDao.update(ownUser._id, userDetails, ownUser).then(user => {
+                    await this.userRepository.update(ownUser._id, userDetails, ownUser).then(user => {
                         res.sendSuccess(user, "User updated successfully!");
                     }).catch(next);
                 } else {
@@ -178,56 +257,10 @@ class AuthService {
         }
     }
 
-     async update(req: Request, res: Response, next: NextFunction) {
-        if (validationsChecker(req, res)) {
-            const _id = req.params._id as unknown as Types.ObjectId;
-            const {email, phone, name} = req.body;
-            const emailCheckUser = await UserDao.getUserByEmail(email);
-            const user = await UserDao.getUser(_id);
-            const ownUser = req.user as IUser;
-
-            if (ownUser) {
-                AppLogger.warn(`emailCheckUser ID: ${emailCheckUser?._id} | update user ID: ${user?._id}`);
-                AppLogger.warn(`emailCheckUser: ${emailCheckUser?.email} | update user: ${user?.email}`);
-
-                if (!emailCheckUser || emailCheckUser._id.equals(user._id)) {
-                    const userDetails: Partial<IUser> = {
-                        email: email,
-                        phone: phone,
-                        name: name,
-                    };
-                    await UserDao.update(_id, userDetails, ownUser).then(user => {
-                        res.sendSuccess(user, "User updated successfully!");
-                    }).catch(next);
-                } else {
-                    res.sendError(`User email already exists`, 422);
-                }
-            } else {
-                ErrorLogger.error(`Update user: Illegal attempt`);
-                res.sendError(`Illegal attempt!`, 403);
-            }
-        }
-    }
-
-    destroy(req: Request, res: Response, next: NextFunction) {
-        if (validationsChecker(req, res)) {
-            const user_id = req.params._id as unknown as Types.ObjectId;
-            const ownUser = req.user as IUser;
-            if (ownUser) {
-                UserDao.destroy(user_id, ownUser).then(user => {
-                    res.sendSuccess(user, "User deleted successfully!");
-                }).catch(next);
-            } else {
-                ErrorLogger.error(`Delete user: Illegal attempt`);
-                res.sendError(`Illegal attempt!`, 403);
-            }
-        }
-    }
-
-    deactivate(req: Request, res: Response, next: NextFunction) {
+    async deactivate(req: Request, res: Response, next: NextFunction) {
         const ownUser = req.user as IUser;
         if (ownUser) {
-            UserDao.deactivate(ownUser._id, ownUser).then(user => {
+            this.userRepository.deactivate(ownUser._id, ownUser).then(user => {
                 res.sendSuccess(user, "User deactivated successfully!");
             }).catch(next);
         } else {
@@ -236,6 +269,21 @@ class AuthService {
         }
     }
 
+    async getSelf(req: Request, res: Response, next: NextFunction) {
+        const ownUser = req.user as IUser;
+        if (ownUser) {
+            this.userRepository.getUser(ownUser._id).then((user: IUser) => {
+                res.sendSuccess(user);
+            }).catch(next);
+        } else {
+            ErrorLogger.error(`Get self: Illegal attempt`);
+            res.sendError(`Illegal attempt!`, 403);
+        }
+    }
+
+    private authTokenValidity(remember: boolean): string {
+        return remember ? "365 days" : "1 day";
+    }
 }
 
 interface PayloadData {
