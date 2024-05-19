@@ -30,7 +30,7 @@ export const RPCObserver = async (RPC_QUEUE_NAME: string, service: CourseService
                 let response = {};
                 // DB Operation
 
-                response = await service.SubscribeRPCObserver(msg.content.toString()); // call fake DB operation
+                response = await service.SubscribeRPCObserver(msg.content.toString()); // call DB operation
 
                 channel.sendToQueue(
                     msg.properties.replyTo,
